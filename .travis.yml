@@ -10,7 +10,7 @@ install:
   - npm install -g hexo
   - npm install -g hexo-cli
   - npm install hexo-deployer-git
-  - sed -i'' "s~git@github.com:~https://${token}@github.com/~" _config.yml
+  - sed -i'' "s~git@github.com:~https://${TOKEN}@github.com/~" _config.yml
 after_success: 
   - hexo d
 notifications: # 设置通知项
