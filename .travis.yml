@@ -1,0 +1,18 @@
+language: node_js
+node_js: 
+  - "10"
+branches: 
+  only: 
+  - resource
+env: 
+  gobal: 
+    secure: 830503907051caad77132b9586c2434cbbea50a9
+script: 
+  - hexo g
+install: 
+  - npm install -g hexo
+  - npm install -g hexo-cli  
+
+after_sucess: 
+  - hexo d
+
