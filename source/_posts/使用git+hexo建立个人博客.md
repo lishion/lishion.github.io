@@ -15,10 +15,10 @@ tag:
 
 ## 建立一个新博客
 
-1. `hexo init blog` : 使用该命令会在blog目录下建立一个博客并且在`source/_posts/hello-world.md`生成一篇名为`hello world`的文章，随后你可以选择删除它并新建自己的文章。
+1. `hexo init blog`:使用该命令会在blog目录下建立一个博客并且在`source/_posts/hello-world.md`生成一篇名为`hello world`的文章，随后你可以选择删除它并新建自己的文章。
 2. `cd blog`
-3. `hexo g` : 使用该命令将 `source/_posts/hello-world.md` 渲染为`html、css、js`静态资源
-4. `hexo s`: 开启服务器。然后http://localhost:4000/
+3. `hexo g`:使用该命令将 `source/_posts/hello-world.md` 渲染为`html、css、js`静态资源
+4. `hexo s`:开启服务器。然后http://localhost:4000/
 
 ## 关联至github
 
@@ -49,17 +49,17 @@ tag:
 
    `git clone https://github.com/tufu9441/maupassant-hexo.git themes/maupassant` 
 
-   `themes/xxx` 是 `hexo` 存放`xxx`主题的目录
+   `themes/xxx`是`hexo`存放`xxx`主题的目录
 
 2. `npm install hexo-renderer-pug --save`
 
 3. `npm install hexo-renderer-sass --save --registry=https://registry.npm.taobao.org`
 
-4. 修改`_config.yml ` 中主题为 `theme: maupassant`
+4. 修改`_config.yml`中主题为`theme: maupassant`
 
 5. `hexo g`重新生成
 
-6. `hexo s` 开启服务器
+6. `hexo s`开启服务器
 
 主题还有许多可用的配置，请参照上面给出的链接进行设置
 
