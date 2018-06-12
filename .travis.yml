@@ -12,7 +12,7 @@ script:
 install: 
   - npm install -g hexo
   - npm install -g hexo-cli
-  - npm npm install hexo-deployer-git
+  - npm install hexo-deployer-git
 after_sucess: 
   - hexo d
 
