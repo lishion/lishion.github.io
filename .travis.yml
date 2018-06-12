@@ -4,15 +4,13 @@ node_js:
 branches: 
   only: 
   - resource
-env: 
-  gobal: 
-    secure: 830503907051caad77132b9586c2434cbbea50a9
 script: 
   - hexo g
 install: 
   - npm install -g hexo
   - npm install -g hexo-cli
   - npm install hexo-deployer-git
+  - sed -i'' "s~git@github.com:~https://${token}@github.com/~" _config.yml
 after_success: 
   - hexo d
 notifications: # 设置通知项
