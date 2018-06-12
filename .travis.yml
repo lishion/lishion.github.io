@@ -13,6 +13,7 @@ install:
   - npm install -g hexo
   - npm install -g hexo-cli
   - npm install hexo-deployer-git
-after_sucess: 
+after_success: 
   - hexo d
-
+notifications: # 设置通知项
+  email: true
