@@ -14,4 +14,5 @@ install:
 after_success: 
   - hexo d
 notifications: # 设置通知项
-  email: true
+  email: 
+    - 544670411@qq.com
