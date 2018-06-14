@@ -116,14 +116,14 @@ fancybox: true
 # Some suprise plugs
 suprise:
   ball: false
-  assist: true
+  #  assist: true
 
 # donate
-donate:
-  enable: true
-  text: 仅仅是一个功能
-  wechat: http://o7keinrz4.bkt.clouddn.com/wechat.jpg
-  alipay: http://o7keinrz4.bkt.clouddn.com/alipay.jpg
+#donate:
+#  enable: true
+#  text: 
+#  wechat: http://o7keinrz4.bkt.clouddn.com/wechat.jpg
+#  alipay: http://o7keinrz4.bkt.clouddn.com/alipay.jpg
 
 # 不蒜子统计
 busuanzi: false

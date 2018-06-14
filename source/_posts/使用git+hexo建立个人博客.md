@@ -22,7 +22,7 @@ tag:
 
 ## 关联至github
 
-1. 新建仓库`xxx.github.io`，这里 xxx 可以是你想要取的命令，但是必须以`github.io`结尾
+1. 新建仓库`xxx.github.io`，这里 xxx 可以是你想要取的名字，但是必须以`github.io`结尾
 
 2. 此时可以访问`https://xxx.github.io`，但是没有内容
 
