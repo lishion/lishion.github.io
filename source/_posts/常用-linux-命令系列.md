@@ -1,6 +1,6 @@
 ---
 title: 常用 Linux 命令系列
-categories: Spark源码阅读计划
+categories: 笔记
 author: lishion
 toc: true
 tags: 

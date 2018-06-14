@@ -1,10 +1,10 @@
-# Hexo Configuration
+## Hexo Configuration
 ## Docs: https://hexo.io/docs/configuration.html
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
 title: Lishion's Blog
-subtitle:
+subtitle: LISHION
 description:
 keywords:
 author: lishion
@@ -73,7 +73,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: maupassant
+theme: next-gux
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
