@@ -434,7 +434,7 @@ private[this] def spillMemoryIteratorToDisk(inMemoryIterator: WritablePartitione
         logError(s"Error while deleting temp file ${tmp.getAbsolutePath}")
     }
 ```
-####　writePartitionedFile
+#### writePartitionedFile
 
 继续看 writePartitionedFile :
 
