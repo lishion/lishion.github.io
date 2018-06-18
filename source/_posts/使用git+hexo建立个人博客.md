@@ -1,6 +1,7 @@
 ---
 title: 使用git + hexo 建立个人博客
 categories: 工具
+date: 2018-06-07 10:42:45
 tag: 
   - 工具
   - 教程
