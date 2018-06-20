@@ -46,7 +46,7 @@
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="写在开始的话shuffle 作为 spark 最重要的一部分，也是很多初学者感到头痛的一部分。简单来说，shuffle 分为两个部分 : shuffle write 和 shuffle read。shuffle write 在 map 端进行，而shuffle read 在 reduce 端进行。本章就准备就 shuffle write 做一个详细的分析。 为什么需要shuffle在上一章Spar">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-13T14:42:19.376Z">
+<meta property="og:updated_time" content="2018-06-18T12:27:15.863Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="spark源码阅读计划 - 第二部分 - shuffle write">
 <meta name="twitter:description" content="写在开始的话shuffle 作为 spark 最重要的一部分，也是很多初学者感到头痛的一部分。简单来说，shuffle 分为两个部分 : shuffle write 和 shuffle read。shuffle write 在 map 端进行，而shuffle read 在 reduce 端进行。本章就准备就 shuffle write 做一个详细的分析。 为什么需要shuffle在上一章Spar">
@@ -154,134 +154,6 @@
       
 
       
-        <style type="text/css">
-
-    .circle {
-        width: 40px;
-        height: 40px;
-        background: #555 no-repeat;
-        cursor: move;
-    }
-
-    .assist-btn {
-        position: fixed;
-        top: 50％;
-        left: 10px;
-        -moz-border-radius: 50px;
-        -webkit-border-radius: 50px;
-        border-radius: 50px;
-        outline: none;
-        border: none;
-        color: #87daff;
-    }
-
-</style>
-
-<script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
-<script type="text/javascript">
-    // 浮动圆点展开与收缩
-    /*
-    $(function () {
-        var assist_box = $('.assist-box');
-        $('#assist_btn').hover(function () {
-            assist_box.stop().show(300);
-        }, function () {
-            assist_box.stop().hide(150);
-        })
-    });
-    */  
-    //浮动圆点拖动
-    $(function () {
-        var box = document.getElementById('assist_btn');
-        box.onmousedown = function (event) {
-            var e = event || window.event,
-                t = e.target || e.srcElement,
-                // 鼠标按下时的坐标x1,y1
-                x1 = e.clientX,
-                y1 = e.clientY,
-                //鼠标按下时的左右偏移量
-                dragLeft = this.offsetLeft,
-                dragTop = this.offsetTop;
-
-            document.onmousemove = function (event) {
-                var e = event || window.event,
-                    t = e.target || e.srcElement,
-                    // 鼠标移动时的动态坐标
-                    x2 = e.clientX,
-                    y2 = e.clientY,
-                    // 鼠标移动时的坐标的变化量
-                    x = x2 - x1,
-                    y = y2 - y1;
-                box.style.left = (dragLeft + x) + 'px';
-                box.style.top = (dragTop + y) + 'px';
-            }
-
-            document.onmouseup = function () {
-                this.onmousemove = null;
-            }
-        }
-    });
-
-/*
-    $whitesmoke   = #f5f5f5
-    $gainsboro    = #eee
-    $gray-lighter = #ddd
-    $grey-light   = #ccc
-    $grey         = #bbb
-    $grey-dark    = #999
-    $grey-dim     = #666
-    $black-light  = #555
-    $black-deep   = #222
-    $red          = #ff2a2a
-    $blue-bright  = #87daff
-    $blue         = #0684bd
-    $blue-deep    = #262a30
-*/
-    // white theme
-    var body = {color: "#555", background: "white"};
-    var a_tag = {color: "#222"};
-    var header = { background: "#f5f5f5"};
-    var logo_line_i = {background: "#222"};
-    // var post_code = {background: "#eee", color: "#222"};
-
-    function switch_theme() {
-        $("body").css(body);
-        $("a:not('.links-of-author-item a, .site-state-item a, .site-state-posts a, .feed-link a, .motion-element a, .post-tags a, .show-commit-cls a, #donate_board a')").css(a_tag);
-        $(".header, .footer").css(header);
-        $(".logo-line-before i, .logo-line-after i").css(logo_line_i);
-        //$(".post code").css(post_code);
-        $("#idhyt-surprise-ball #idhyt-surprise-ball-animation .drag").css(a_tag);
-        $(".post-title-link, .posts-expand .post-meta, .post-comments-count, .disqus-comment-count, .post-category a, .post-nav-next a, .post-nav-item a").css(a_tag);
-        
-        // $("code").css({color: '#c5c8c6', background: '#1d1f21'});
-        $("#assist_btn").hide(1500);
-    }
-
-    $(function () {
-        $("#assist_btn").dblclick(function() {
-            switch_theme();
-        });
-    });
-
-</script>
-
-<div>
-
-    <button class="assist-btn circle" id="assist_btn" title="双击切换">
-        亮
-    </button>
-
-</div>
-
-
-
-
-
-
-
-
-
-      
 
     
 
@@ -383,8 +255,7 @@
 <p>这就是整个　insertAll()　方法:</p>
 <p> merge 达到溢出值后进行排序并写入临时文件，这里要注意的是并非所有的缓存文件都被写入到临时文件中，所以接下来需要将临时文件中的数据加上内存中的数据进行一次排序写入到一个大文件中。</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//首先获取需要写入的文件:　</span></span><br><span class="line">   <span class="keyword">val</span> output = shuffleBlockResolver.getDataFile(dep.shuffleId, mapId)</span><br><span class="line">　　<span class="keyword">val</span> tmp = <span class="type">Utils</span>.tempFileWith(output)</span><br><span class="line">    <span class="keyword">try</span> &#123; </span><br><span class="line">      <span class="keyword">val</span> blockId = <span class="type">ShuffleBlockId</span>(dep.shuffleId, mapId, <span class="type">IndexShuffleBlockResolver</span>.<span class="type">NOOP_REDUCE_ID</span>)</span><br><span class="line">      <span class="keyword">val</span> partitionLengths = sorter.writePartitionedFile(blockId, tmp)<span class="comment">//这一句是重点 下面会讲解</span></span><br><span class="line">      shuffleBlockResolver.writeIndexFileAndCommit(dep.shuffleId, mapId, partitionLengths, tmp)</span><br><span class="line">      mapStatus = <span class="type">MapStatus</span>(blockManager.shuffleServerId, partitionLengths)</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (tmp.exists() &amp;&amp; !tmp.delete()) &#123;</span><br><span class="line">        logError(<span class="string">s"Error while deleting temp file <span class="subst">$&#123;tmp.getAbsolutePath&#125;</span>"</span>)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>####　writePartitionedFile</p>
-<p>继续看 writePartitionedFile :</p>
+<h4 id="writePartitionedFile"><a href="#writePartitionedFile" class="headerlink" title="writePartitionedFile"></a>writePartitionedFile</h4><p>继续看 writePartitionedFile :</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  ExternalSorter 中的　writePartitionedFile　方法</span></span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">writePartitionedFile</span></span>(</span><br><span class="line">      blockId: <span class="type">BlockId</span>,</span><br><span class="line">      outputFile: <span class="type">File</span>): <span class="type">Array</span>[<span class="type">Long</span>] = &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Track location of each range in the output file</span></span><br><span class="line">    <span class="keyword">val</span> lengths = <span class="keyword">new</span> <span class="type">Array</span>[<span class="type">Long</span>](numPartitions)</span><br><span class="line">    <span class="keyword">val</span> writer = blockManager.getDiskWriter(blockId, outputFile, serInstance, fileBufferSize,</span><br><span class="line">      context.taskMetrics().shuffleWriteMetrics)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里的spills 就是　刚才产生的临时文件的数据　如果为空逻辑就比较简单，直接进行排序并写入文件</span></span><br><span class="line">    <span class="keyword">if</span> (spills.isEmpty) &#123;</span><br><span class="line">      <span class="comment">// Case where we only have in-memory data</span></span><br><span class="line">      <span class="keyword">val</span> collection = <span class="keyword">if</span> (aggregator.isDefined) map <span class="keyword">else</span> buffer</span><br><span class="line">      <span class="keyword">val</span> it = collection.destructiveSortedWritablePartitionedIterator(comparator)　<span class="comment">//这里同样使用　destructiveSortedWritablePartitionedIterator　进行排序</span></span><br><span class="line">      <span class="keyword">while</span> (it.hasNext) &#123;</span><br><span class="line">        <span class="keyword">val</span> partitionId = it.nextPartition()</span><br><span class="line">        <span class="keyword">while</span> (it.hasNext &amp;&amp; it.nextPartition() == partitionId) &#123;</span><br><span class="line">          it.writeNext(writer)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">val</span> segment = writer.commitAndGet()</span><br><span class="line">        lengths(partitionId) = segment.length</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;<span class="comment">//重点看不为空的时候，这里调用了　partitionedIterator　方法</span></span><br><span class="line">      <span class="comment">// We must perform merge-sort; get an iterator by partition and write everything directly.</span></span><br><span class="line">      <span class="keyword">for</span> ((id, elements) &lt;- <span class="keyword">this</span>.partitionedIterator) &#123;</span><br><span class="line">        <span class="keyword">if</span> (elements.hasNext) &#123;</span><br><span class="line">          <span class="keyword">for</span> (elem &lt;- elements) &#123;</span><br><span class="line">            writer.write(elem._1, elem._2)</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">val</span> segment = writer.commitAndGet()</span><br><span class="line">          lengths(id) = segment.length</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    writer.close()</span><br><span class="line">    context.taskMetrics().incMemoryBytesSpilled(memoryBytesSpilled)</span><br><span class="line">    context.taskMetrics().incDiskBytesSpilled(diskBytesSpilled)</span><br><span class="line">    context.taskMetrics().incPeakExecutionMemory(peakMemoryUsedBytes)</span><br><span class="line"></span><br><span class="line">    lengths</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 <p>然后是 partitionedIterator 方法:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">partitionedIterator</span></span>: <span class="type">Iterator</span>[(<span class="type">Int</span>, <span class="type">Iterator</span>[<span class="type">Product2</span>[<span class="type">K</span>, <span class="type">C</span>]])] = &#123;</span><br><span class="line">    <span class="keyword">val</span> usingMap = aggregator.isDefined</span><br><span class="line">    <span class="keyword">val</span> collection: <span class="type">WritablePartitionedPairCollection</span>[<span class="type">K</span>, <span class="type">C</span>] = <span class="keyword">if</span> (usingMap) map <span class="keyword">else</span> buffer</span><br><span class="line">    <span class="keyword">if</span> (spills.isEmpty) &#123;<span class="comment">// 这里又一次判断了是否为空，直接看有临时文件的部分</span></span><br><span class="line">      <span class="comment">// Special case: if we have only in-memory data, we don't need to merge streams, and perhaps</span></span><br><span class="line">      <span class="comment">// we don't even need to sort by anything other than partition ID</span></span><br><span class="line">      <span class="keyword">if</span> (!ordering.isDefined) &#123;</span><br><span class="line">        <span class="comment">// The user hasn't requested sorted keys, so only sort by partition ID, not key</span></span><br><span class="line">   groupByPartition(destructiveIterator(collection.partitionedDestructiveSortedIterator(<span class="type">None</span>)))</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// We do need to sort by both partition ID and key</span></span><br><span class="line">        groupByPartition(destructiveIterator(</span><br><span class="line">          collection.partitionedDestructiveSortedIterator(<span class="type">Some</span>(keyComparator))))</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// Merge spilled and in-memory data</span></span><br><span class="line">      <span class="comment">// 这里传入了临时文件　spills　和　排序后的缓存文件</span></span><br><span class="line">      merge(spills, destructiveIterator(</span><br><span class="line">        collection.partitionedDestructiveSortedIterator(comparator)))</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
@@ -416,13 +287,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/06/11/Spark-源码阅读计划-伪-第三部分-图解-shuffle-read/" rel="prev">Spark 源码阅读计划 - 第三部分 - 图解 shuffle read</a>
+              <a href="/2018/06/09/常用-linux-命令系列/" rel="prev">常用 Linux 命令系列</a>
             
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/06/Spark-源码阅读计划-第一部分-迭代计算/" rel="next">Spark 源码阅读计划 - 第一部分 - 迭代计算</a>
+              <a href="/2018/06/07/使用git+hexo建立个人博客/" rel="next">使用git + hexo 建立个人博客</a>
             
           </div>
         </div>
@@ -436,134 +307,6 @@
 
 
     <div>
-      
-        <style type="text/css">
-
-    .donate_bar {
-        text-align: center;
-        margin-top : 5%;
-    }
-
-    .donate_bar.hidden {
-        display:none;
-    }
-/*
-    .donate_bar a.btn_donate {
-        display: inline-block;
-        width: 82px;
-        height: 82px;
-        margin-left:auto;
-        margin-right:auto;
-
-        background: url("http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif") no-repeat;
-        _background: url("http://img.t.sinajs.cn/t5/style/images/apps_PRF/e_media/btn_reward.gif") no-repeat; 
-
-        -webkit-transition: background 0s;
-        -moz-transition: background 0s;
-        -o-transition: background 0s;
-        -ms-transition: background 0s;
-        transition: background 0s;
-    }
-*/
-    .donate_bar a.btn_donate:hover { 
-        // background-position: 0px -82px;
-        color: #87daff
-    }
-
-    .donate_bar .donate_txt {
-        display: block;
-        color: #9d9d9d;
-        font: 14px/2 "Microsoft Yahei";
-    }
-
-    .bold { 
-        font-weight: bold; 
-    }
-
-    .post-donate a {
-        border-bottom: 0px;
-    }
-
-    #donate_guide table {
-        border: none;
-    }
-
-    #donate_guide td {
-        border-bottom: none;
-        border-right: none;
-        background: #333333;
-        valign: top;
-    }
-
-</style>
-
-
-
-    
-
-    <div class ="post-donate">
-        <div id="donate_board" class="donate_bar center">
-              <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏">赏</a>
-              <span id="donate_txt" class="donate_txt">
-                   
-                        仅仅是一个功能
-                   
-              </span>
-            <br>
-        </div>  
-  
-        <div id="donate_guide" class="donate_bar center hidden">
-            <!--
-            
-                <a href="http://o7keinrz4.bkt.clouddn.com/alipay.jpg" title="支付宝打赏" class="fancybox" rel="article0" 
-                    style="float:left;margin-left:25%;margin-right:10px;">
-                    <img src="http://o7keinrz4.bkt.clouddn.com/alipay.jpg" title="" height="164px" width="164px">
-                </a> 
-              
-
-            
-                <a href="http://o7keinrz4.bkt.clouddn.com/wechat.jpg" title="微信打赏" class="fancybox" rel="article0"
-                    style="margin-right:30%">
-                    <img src="http://o7keinrz4.bkt.clouddn.com/wechat.jpg" title="" height="164px" width="164px">
-                </a>
-            
-            -->
-            <table>
-                <tr>
-                    <td>
-                        
-                            <a href="http://o7keinrz4.bkt.clouddn.com/alipay.jpg" title="支付宝打赏" class="fancybox" rel="article0" 
-                                style="float:left;margin-left:25%;margin-right:10px;">
-                                <img src="http://o7keinrz4.bkt.clouddn.com/alipay.jpg" title="" height="164px" width="164px">
-                            </a> 
-                         
-                    </td>
-                    <td>
-                        
-                            <a href="http://o7keinrz4.bkt.clouddn.com/wechat.jpg" title="微信打赏" class="fancybox" rel="article0"
-                                style="margin-right:30%">
-                                <img src="http://o7keinrz4.bkt.clouddn.com/wechat.jpg" title="" height="164px" width="164px">
-                            </a>
-                        
-                    </td>
-                </tr>
-            </table>
-
-        </div>
-
-        <script type="text/javascript">
-            document.getElementById('btn_donate').onclick = function() {
-                $('#donate_board').addClass('hidden');
-                // $('#donate_guide').removeClass('hidden');
-                $('#donate_guide').show(2000);
-            }
-
-        </script>
-    </div>
-
-    
-
-
       
     </div>
 
@@ -630,14 +373,14 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">8</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-count">4</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
@@ -678,7 +421,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#写在开始的话"><span class="nav-number">1.</span> <span class="nav-text">写在开始的话</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要shuffle"><span class="nav-number">2.</span> <span class="nav-text">为什么需要shuffle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个小例子"><span class="nav-number">3.</span> <span class="nav-text">一个小例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shuffle-task"><span class="nav-number">4.</span> <span class="nav-text">shuffle task</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#insertAll"><span class="nav-number">4.0.1.</span> <span class="nav-text">insertAll</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#写在开始的话"><span class="nav-number">1.</span> <span class="nav-text">写在开始的话</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要shuffle"><span class="nav-number">2.</span> <span class="nav-text">为什么需要shuffle</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个小例子"><span class="nav-number">3.</span> <span class="nav-text">一个小例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shuffle-task"><span class="nav-number">4.</span> <span class="nav-text">shuffle task</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#insertAll"><span class="nav-number">4.0.1.</span> <span class="nav-text">insertAll</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#writePartitionedFile"><span class="nav-number">4.0.2.</span> <span class="nav-text">writePartitionedFile</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
