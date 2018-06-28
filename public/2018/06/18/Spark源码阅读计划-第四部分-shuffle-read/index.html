@@ -4,7 +4,7 @@
 <head>
   
 
-<meta charset="UTF-8"/>
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -58,13 +58,14 @@
     sidebar: 'post'
   };
 </script>
+<link href="https://cdn.bootcss.com/KaTeX/0.7.1/katex.min.css" rel="stylesheet">
 
-  <title> Spark源码阅读计划-第四部分-shuffle read | Lishion's Blog </title>
+  <title> Spark源码阅读计划-第四部分-shuffle read | Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
 
-  <!--[if lte IE 8]>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!--[if lte IE 8]>
   <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
     <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
       <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
@@ -217,7 +218,8 @@
 
       
         <span itemprop="articleBody"><p>拖了这么久终于把 shuffle read 部分的源码看了一遍了。虽然 shuffle read 再数据合并部分的逻辑要比 shuffle 简单，但是由于这个过程中 executor 要到 master 拉取 shuffle write 结果信息，就涉及到 spark 的 block manager 的一些东西，因此完整的 shuffle read 过程依然是很复杂的。但是由于我还是太菜了，对于 block manage 这一部分看的一知半解，因此关于 executor 与 master 进行元数据交互的部分也就不会写得很详细，当然还是会涉及到一些。有关 block manage 的这部分以后应该会写到，先立个 flag 在这里吧。</p>
-<h2 id="MapStatus"><a href="#MapStatus" class="headerlink" title="MapStatus"></a>MapStatus</h2><p>在 shuffle write 完成之后会返回一个 MapStatus，MapStatus记录了 BlockManagerId 以及最终每个分区的大小。其中 BlockManagerId 包含了 BlockManager 所在的 host 以及 port 等信息。返回的 MapStatus 最终会被 Driver 端获并存储以便于 mapper 端获取。 这里要稍微提一下 BlockManager 的知识，Spark 利用 BlockManager 对数据进行读写，而 Block 就是其中的基本单位。每一个 Block 拥有一个 id。而通过BlockManager 则可以操作这些 Block 。因此 mapper 端只需要知道 BlockManager 的位置以及所需要的文件在哪些 Block 就能获取到对应的数据。这里通过 MapOutputTracker 通过 shuffleid 对一次 shuffle write 中所有的 mapper 产生的 MapStatus 进行了记录。</p>
+<h2 id="mapstatus"><a class="markdownIt-Anchor" href="#mapstatus"></a> MapStatus</h2>
+<p>在 shuffle write 完成之后会返回一个 MapStatus，MapStatus记录了 BlockManagerId 以及最终每个分区的大小。其中 BlockManagerId 包含了 BlockManager 所在的 host 以及 port 等信息。返回的 MapStatus 最终会被 Driver 端获并存储以便于 mapper 端获取。 这里要稍微提一下 BlockManager 的知识，Spark 利用 BlockManager 对数据进行读写，而 Block 就是其中的基本单位。每一个 Block 拥有一个 id。而通过BlockManager 则可以操作这些 Block 。因此 mapper 端只需要知道 BlockManager 的位置以及所需要的文件在哪些 Block 就能获取到对应的数据。这里通过 MapOutputTracker 通过 shuffleid 对一次 shuffle write 中所有的 mapper 产生的 MapStatus 进行了记录。</p>
 <p>在每一个 mapper 的 shuffle task 结束后，MapOutputTracker就会将其返回的 MapStatues 进行注册。在 DAGScheduler 中可以看到:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> smt: <span class="type">ShuffleMapTask</span> =&gt;</span><br><span class="line">             <span class="keyword">val</span> shuffleStage = stage.asInstanceOf[<span class="type">ShuffleMapStage</span>]</span><br><span class="line">             <span class="keyword">val</span> status = event.result.asInstanceOf[<span class="type">MapStatus</span>]</span><br><span class="line">             <span class="keyword">val</span> execId = status.location.executorId</span><br><span class="line">		  </span><br><span class="line">             mapOutputTracker.registerMapOutput(</span><br><span class="line">               shuffleStage.shuffleDep.shuffleId, smt.partitionId, status)</span><br></pre></td></tr></table></figure>
 <p>这里的 MapOutputTracker 实际的类型为 MapOutputTrackerMaster 。继续看关于注册的代码:</p>
@@ -225,7 +227,8 @@
 <p>shuffleStatuses 实际上是一个 hashmap:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">val</span> shuffleStatuses = <span class="keyword">new</span> <span class="type">ConcurrentHashMap</span>[<span class="type">Int</span>, <span class="type">ShuffleStatus</span>]().asScala</span><br></pre></td></tr></table></figure>
 <p>ShuffleStatus 是一个类，里面包含了一个 MapStatus 数组。也就是说，通过在 shuffle write 之前注册的 shuffle 所用的 shuffleid 作为索引存储了 shuffle write 过程产生的 MapStatus。而 MapOutputTrackerMaster 是用于 Driver 端的。用于 Executor 的则是 MapOutputTrackerWorker 。在 MapOutputTrackerWorker 中一开始是没有 shuffleStatuses 的。需要从 MapOutputTrackerMaster 中获取。</p>
-<h2 id="shuffle-read"><a href="#shuffle-read" class="headerlink" title="shuffle read"></a>shuffle read</h2><p>shuffle read 代码开始于 Shuffled 中的 compute 方法:</p>
+<h2 id="shuffle-read"><a class="markdownIt-Anchor" href="#shuffle-read"></a> shuffle read</h2>
+<p>shuffle read 代码开始于 Shuffled 中的 compute 方法:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">compute</span></span>(split: <span class="type">Partition</span>, context: <span class="type">TaskContext</span>): <span class="type">Iterator</span>[(<span class="type">K</span>, <span class="type">C</span>)] = &#123;</span><br><span class="line">    <span class="keyword">val</span> dep = dependencies.head.asInstanceOf[<span class="type">ShuffleDependency</span>[<span class="type">K</span>, <span class="type">V</span>, <span class="type">C</span>]]</span><br><span class="line">    <span class="type">SparkEnv</span>.get.shuffleManager.getReader(dep.shuffleHandle, split.index, split.index + <span class="number">1</span>, context)</span><br><span class="line">      .read()</span><br><span class="line">      .asInstanceOf[<span class="type">Iterator</span>[(<span class="type">K</span>, <span class="type">C</span>)]]</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 <p>可以看到这里传入了需要计算的分区。代码中获取了一个 reader 并调用了其 read 方法。 getReader 代码如下:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">getReader</span></span>[<span class="type">K</span>, <span class="type">C</span>](</span><br><span class="line">    handle: <span class="type">ShuffleHandle</span>,</span><br><span class="line">    startPartition: <span class="type">Int</span>,</span><br><span class="line">    endPartition: <span class="type">Int</span>,</span><br><span class="line">    context: <span class="type">TaskContext</span>): <span class="type">ShuffleReader</span>[<span class="type">K</span>, <span class="type">C</span>] = &#123;</span><br><span class="line">  <span class="keyword">new</span> <span class="type">BlockStoreShuffleReader</span>(</span><br><span class="line">    handle.asInstanceOf[<span class="type">BaseShuffleHandle</span>[<span class="type">K</span>, _, <span class="type">C</span>]], startPartition, endPartition, context)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -361,21 +364,21 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">7</span>
               <span class="site-state-item-name">tags</span>
               </a>
           </div>
@@ -409,7 +412,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MapStatus"><span class="nav-number">1.</span> <span class="nav-text">MapStatus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shuffle-read"><span class="nav-number">2.</span> <span class="nav-text">shuffle read</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#mapstatus"><span class="nav-number">1.</span> <span class="nav-text"> MapStatus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#shuffle-read"><span class="nav-number">2.</span> <span class="nav-text"> shuffle read</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -670,6 +673,6 @@
         effect: "fadeIn"
       });
     });
-  </script>
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </body>
 </html>

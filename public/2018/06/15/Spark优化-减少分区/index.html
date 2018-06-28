@@ -4,7 +4,7 @@
 <head>
   
 
-<meta charset="UTF-8"/>
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -38,18 +38,18 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。 原">
+<meta name="description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。">
 <meta name="keywords" content="Spark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark调优-选择合适的分区">
 <meta property="og:url" content="http://yoursite.com/2018/06/15/Spark优化-减少分区/index.html">
 <meta property="og:site_name" content="Lishion&#39;s Blog">
-<meta property="og:description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。 原">
+<meta property="og:description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2018-06-18T02:38:01.192Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark调优-选择合适的分区">
-<meta name="twitter:description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。 原">
+<meta name="twitter:description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,13 +58,14 @@
     sidebar: 'post'
   };
 </script>
+<link href="https://cdn.bootcss.com/KaTeX/0.7.1/katex.min.css" rel="stylesheet">
 
-  <title> Spark调优-选择合适的分区 | Lishion's Blog </title>
+  <title> Spark调优-选择合适的分区 | Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
 
-  <!--[if lte IE 8]>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!--[if lte IE 8]>
   <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
     <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
       <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
@@ -217,8 +218,10 @@
 
       
         <span itemprop="articleBody"><p>昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用<code>sc.textFile(&quot;xxx&quot;)</code>读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>我们知道分区的个数是等于 task 的个数的。如果分区数量远大于并行度，那么就会造成大量的时间浪费在 task 的切换中。而如果分区数量小于并行度，那么就会存在一些核心无法分配到需要的数据而闲置，造成资源浪费。因此在设置分区的时候尽量等于并行度。</p>
-<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>可以使用 coalesce 和 repartition 可以对 RDD 重新设置分区的个数。具体区别会在<a href="https://lishion.github.io/categories/Spark%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E8%AE%A1%E5%88%92/" target="_blank" rel="noopener">Spark源码阅读计划</a>中讲解。</p>
+<h2 id="原因"><a class="markdownIt-Anchor" href="#原因"></a> 原因</h2>
+<p>我们知道分区的个数是等于 task 的个数的。如果分区数量远大于并行度，那么就会造成大量的时间浪费在 task 的切换中。而如果分区数量小于并行度，那么就会存在一些核心无法分配到需要的数据而闲置，造成资源浪费。因此在设置分区的时候尽量等于并行度。</p>
+<h2 id="方法"><a class="markdownIt-Anchor" href="#方法"></a> 方法</h2>
+<p>可以使用 coalesce 和 repartition 可以对 RDD 重新设置分区的个数。具体区别会在<a href="https://lishion.github.io/categories/Spark%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E8%AE%A1%E5%88%92/" target="_blank" rel="noopener">Spark源码阅读计划</a>中讲解。</p>
 </span>
       
     </div>
@@ -322,21 +325,21 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">8</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">7</span>
               <span class="site-state-item-name">tags</span>
               </a>
           </div>
@@ -370,7 +373,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法"><span class="nav-number">2.</span> <span class="nav-text">方法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text"> 原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法"><span class="nav-number">2.</span> <span class="nav-text"> 方法</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -631,6 +634,6 @@
         effect: "fadeIn"
       });
     });
-  </script>
+  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </body>
 </html>
