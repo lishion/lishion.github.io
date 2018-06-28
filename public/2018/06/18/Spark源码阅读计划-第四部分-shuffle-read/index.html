@@ -46,7 +46,7 @@
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="拖了这么久终于把 shuffle read 部分的源码看了一遍了。虽然 shuffle read 再数据合并部分的逻辑要比 shuffle 简单，但是由于这个过程中 executor 要到 master 拉取 shuffle write 结果信息，就涉及到 spark 的 block manager 的一些东西，因此完整的 shuffle read 过程依然是很复杂的。但是由于我还是太菜了，对于">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-18T14:52:45.546Z">
+<meta property="og:updated_time" content="2018-06-28T05:16:14.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark源码阅读计划-第四部分-shuffle read">
 <meta name="twitter:description" content="拖了这么久终于把 shuffle read 部分的源码看了一遍了。虽然 shuffle read 再数据合并部分的逻辑要比 shuffle 简单，但是由于这个过程中 executor 要到 master 拉取 shuffle write 结果信息，就涉及到 spark 的 block manager 的一些东西，因此完整的 shuffle read 过程依然是很复杂的。但是由于我还是太菜了，对于">
@@ -364,7 +364,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-count">11</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
