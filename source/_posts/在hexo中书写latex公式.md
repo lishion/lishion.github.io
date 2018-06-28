@@ -9,7 +9,7 @@ author: lishion
 toc: true
 ---
 
-昨天在写笔记的时候发现在 typora 中可以正确显示的 latex 公式 hexo 无法正确渲染。hexo 默认渲染器不支持 latex公式。需要安装插件才能使用。这里我采用了[hexo-renderer-markdown-it-plus](https://github.com/CHENXCHEN/hexo-renderer-markdown-it-plus) 替换默认的渲染器。其中公式渲染采用 [katx](https://khan.github.io/KaTeX/) 使用步骤如下:
+昨天在写笔记的时候发现在 typora 中可以正确显示的 latex 公式 hexo 无法正确渲染。hexo 默认渲染器不支持 latex公式。需要安装插件才能使用。这里我采用了[hexo-renderer-markdown-it-plus](https://github.com/CHENXCHEN/hexo-renderer-markdown-it-plus) 替换默认的渲染器。其中公式渲染采用 [katex](https://khan.github.io/KaTeX/) 使用步骤如下:
 
 1. 安装依赖:
 
