@@ -6,10 +6,15 @@ branches:
   - resource
 script: 
   - hexo g
+cache: 
+  directories: 
+    - node_modules
 install: 
-  - npm install -g hexo
-  - npm install -g hexo-cli
-  - npm install hexo-deployer-git
+#- npm install hexo
+# - npm install hexo-cli
+# - npm install hexo-deployer-git
+# - npm install hexo-renderer-markdown-it-plus
+# - npm install markdown-it-katex
   - sed -i'' "s~git@github.com:~https://${TOKEN}@github.com/~" _config.yml
 after_success: 
   - hexo d
