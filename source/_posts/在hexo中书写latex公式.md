@@ -34,7 +34,7 @@ toc: true
        pre_class: highlight
    ```
 
-   3. 修改主题模板:
+3. 修改主题模板:
 
       主题的 head 模板位于: `themes/next-gux/layout/_partials/head.swig` 中。将
 
