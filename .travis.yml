@@ -6,9 +6,9 @@ branches:
   - resource
 script: 
   - hexo g
-cache: 
-  directories: 
-    - node_modules
+    #cache: 
+    #directories: 
+    #- node_modules
 install: 
   - npm install hexo
   - npm install hexo-cli
