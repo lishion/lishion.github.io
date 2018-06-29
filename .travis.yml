@@ -4,7 +4,8 @@ node_js:
 branches: 
   only: 
   - resource
-script: 
+script:
+  - hexo clean      
   - hexo g
     #cache: 
     #directories: 
