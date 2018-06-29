@@ -13,9 +13,11 @@ toc: true
 
 1. 安装依赖:
 
+   `npm uninstall hexo-renderer-marked`
+
    `npm install hexo-renderer-markdown-it-plus`
 
-   `npm install markdown-it`
+   `npm install markdown-it-katex`
 
 2. 修改配置文件
 

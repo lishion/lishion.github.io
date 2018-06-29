@@ -21,7 +21,7 @@
 {% if theme.fancybox %}
   <link rel="stylesheet" type="text/css" href="{{ url_for(theme.vendors) }}/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
 {% endif %}
-
+<link href="https://cdn.bootcss.com/KaTeX/0.9.0/katex.min.css" type="text/css"  rel="stylesheet">
 {% if config.language !== 'zh-Hans' and theme.use_font_lato %}
   <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 {% endif %}
@@ -59,4 +59,3 @@
     sidebar: '{{ theme.sidebar }}'
   };
 </script>
-<link href="https://cdn.bootcss.com/KaTeX/0.8.3/katex.min.css" rel="stylesheet">

@@ -19,7 +19,7 @@
 
   <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
 
-
+<link href="https://cdn.bootcss.com/KaTeX/0.9.0/katex.min.css" type="text/css"  rel="stylesheet">
 
   <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 
@@ -38,18 +38,18 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="首先立一个flag，这将是一个长期更新的版块。  写在最开始 在我使用spark进行日志分析的时候感受到了spark的便捷与强大。在学习spark初期，我阅读了许多与spark相关的文档，在这个过程中了解了RDD，分区，shuffle等概念，但是我并没有对这些概念有更多具体的认识。由于不了解spark的基本运作方式使得我在编写代码的时候十分困扰。由于这个原因，我准备阅读spark的源代码来解决我对">
+<meta name="description" content="首先立一个flag，这将是一个长期更新的版块。 写在最开始在我使用spark进行日志分析的时候感受到了spark的便捷与强大。在学习spark初期，我阅读了许多与spark相关的文档，在这个过程中了解了RDD，分区，shuffle等概念，但是我并没有对这些概念有更多具体的认识。由于不了解spark的基本运作方式使得我在编写代码的时候十分困扰。由于这个原因，我准备阅读spark的源代码来解决我对基本">
 <meta name="keywords" content="Spark,编程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark 源码阅读计划 - 第一部分 - 迭代计算">
 <meta property="og:url" content="http://yoursite.com/2018/06/06/Spark-源码阅读计划-第一部分-迭代计算/index.html">
 <meta property="og:site_name" content="Lishion&#39;s Blog">
-<meta property="og:description" content="首先立一个flag，这将是一个长期更新的版块。  写在最开始 在我使用spark进行日志分析的时候感受到了spark的便捷与强大。在学习spark初期，我阅读了许多与spark相关的文档，在这个过程中了解了RDD，分区，shuffle等概念，但是我并没有对这些概念有更多具体的认识。由于不了解spark的基本运作方式使得我在编写代码的时候十分困扰。由于这个原因，我准备阅读spark的源代码来解决我对">
+<meta property="og:description" content="首先立一个flag，这将是一个长期更新的版块。 写在最开始在我使用spark进行日志分析的时候感受到了spark的便捷与强大。在学习spark初期，我阅读了许多与spark相关的文档，在这个过程中了解了RDD，分区，shuffle等概念，但是我并没有对这些概念有更多具体的认识。由于不了解spark的基本运作方式使得我在编写代码的时候十分困扰。由于这个原因，我准备阅读spark的源代码来解决我对基本">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-13T14:42:19.376Z">
+<meta property="og:updated_time" content="2018-06-29T09:23:58.682Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark 源码阅读计划 - 第一部分 - 迭代计算">
-<meta name="twitter:description" content="首先立一个flag，这将是一个长期更新的版块。  写在最开始 在我使用spark进行日志分析的时候感受到了spark的便捷与强大。在学习spark初期，我阅读了许多与spark相关的文档，在这个过程中了解了RDD，分区，shuffle等概念，但是我并没有对这些概念有更多具体的认识。由于不了解spark的基本运作方式使得我在编写代码的时候十分困扰。由于这个原因，我准备阅读spark的源代码来解决我对">
+<meta name="twitter:description" content="首先立一个flag，这将是一个长期更新的版块。 写在最开始在我使用spark进行日志分析的时候感受到了spark的便捷与强大。在学习spark初期，我阅读了许多与spark相关的文档，在这个过程中了解了RDD，分区，shuffle等概念，但是我并没有对这些概念有更多具体的认识。由于不了解spark的基本运作方式使得我在编写代码的时候十分困扰。由于这个原因，我准备阅读spark的源代码来解决我对基本">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +58,6 @@
     sidebar: 'post'
   };
 </script>
-<link href="https://cdn.bootcss.com/KaTeX/0.8.3/katex.min.css" rel="stylesheet">
 
   <title> Spark 源码阅读计划 - 第一部分 - 迭代计算 | Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
@@ -218,19 +217,13 @@
 
       
         <span itemprop="articleBody"><p>首先立一个flag，这将是一个长期更新的版块。</p>
-<h2 id="写在最开始"><a class="markdownIt-Anchor" href="#写在最开始"></a> 写在最开始</h2>
-<p>在我使用<code>spark</code>进行日志分析的时候感受到了<code>spark</code>的便捷与强大。在学习<code>spark</code>初期，我阅读了许多与<code>spark</code>相关的文档，在这个过程中了解了<code>RDD</code>，<code>分区</code>，<code>shuffle</code>等概念，但是我并没有对这些概念有更多具体的认识。由于不了解<code>spark</code>的基本运作方式使得我在编写代码的时候十分困扰。由于这个原因，我准备阅读<code>spark</code>的源代码来解决我对基本概念的认识。</p>
-<h2 id="本部分主要内容"><a class="markdownIt-Anchor" href="#本部分主要内容"></a> 本部分主要内容</h2>
-<p>虽然该章节的名字叫做<strong>迭代计算</strong>，但是本章会讨论包括<strong>RDD、分区、Job、迭代计算</strong>等相关的内容，其中会重点讨论分区与迭代计算。因此在阅读本章之前你至少需要对这些提到的概念有一定的了解。</p>
-<h2 id="准备工作"><a class="markdownIt-Anchor" href="#准备工作"></a> 准备工作</h2>
-<p>你需要准备一份 Spark 的源代码以及一个便于全局搜索的编辑器|IDE。</p>
-<h2 id="一个简单的例子"><a class="markdownIt-Anchor" href="#一个简单的例子"></a> 一个简单的例子</h2>
-<p>假设现在我们有这样一个需求 : 寻找从 0 to 100 的偶数并输出其总数。利用 spark 编写代码如下:</p>
+<h2 id="写在最开始"><a href="#写在最开始" class="headerlink" title="写在最开始"></a>写在最开始</h2><p>在我使用<code>spark</code>进行日志分析的时候感受到了<code>spark</code>的便捷与强大。在学习<code>spark</code>初期，我阅读了许多与<code>spark</code>相关的文档，在这个过程中了解了<code>RDD</code>，<code>分区</code>，<code>shuffle</code>等概念，但是我并没有对这些概念有更多具体的认识。由于不了解<code>spark</code>的基本运作方式使得我在编写代码的时候十分困扰。由于这个原因，我准备阅读<code>spark</code>的源代码来解决我对基本概念的认识。</p>
+<h2 id="本部分主要内容"><a href="#本部分主要内容" class="headerlink" title="本部分主要内容"></a>本部分主要内容</h2><p>虽然该章节的名字叫做<strong>迭代计算</strong>，但是本章会讨论包括<strong>RDD、分区、Job、迭代计算</strong>等相关的内容，其中会重点讨论分区与迭代计算。因此在阅读本章之前你至少需要对这些提到的概念有一定的了解。</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>你需要准备一份 Spark 的源代码以及一个便于全局搜索的编辑器|IDE。</p>
+<h2 id="一个简单的例子"><a href="#一个简单的例子" class="headerlink" title="一个简单的例子"></a>一个简单的例子</h2><p>假设现在我们有这样一个需求 : 寻找从 0 to 100 的偶数并输出其总数。利用 spark 编写代码如下:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sc.parallelize(<span class="number">0</span> to <span class="number">100</span>).filter(_%<span class="number">2</span> == <span class="number">0</span>).count</span><br><span class="line"><span class="comment">//res0: Long = 51</span></span><br></pre></td></tr></table></figure>
 <p>这是一个非常简单的例子，但是里面却蕴涵了许多基础的知识。这一章的内容也是从这个例子展开的。</p>
-<h2 id="迭代计算"><a class="markdownIt-Anchor" href="#迭代计算"></a> 迭代计算</h2>
-<h3 id="comput-方法与-itertor"><a class="markdownIt-Anchor" href="#comput-方法与-itertor"></a> comput 方法与 itertor</h3>
-<p>在RDD.scala 定义的类 RDD中，有两个实现迭代计算的核心方法，分别是<code>compute</code>以及<code>itertor</code>方法。其中<code>itertor</code>方法如下:</p>
+<h2 id="迭代计算"><a href="#迭代计算" class="headerlink" title="迭代计算"></a>迭代计算</h2><h3 id="comput-方法与-itertor"><a href="#comput-方法与-itertor" class="headerlink" title="comput 方法与 itertor"></a>comput 方法与 itertor</h3><p>在RDD.scala 定义的类 RDD中，有两个实现迭代计算的核心方法，分别是<code>compute</code>以及<code>itertor</code>方法。其中<code>itertor</code>方法如下:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="function"><span class="keyword">def</span> <span class="title">iterator</span></span>(split: <span class="type">Partition</span>, context: <span class="type">TaskContext</span>): <span class="type">Iterator</span>[<span class="type">T</span>] = &#123;</span><br><span class="line">  <span class="keyword">if</span> (storageLevel != <span class="type">StorageLevel</span>.<span class="type">NONE</span>) &#123;<span class="comment">//如果有缓存</span></span><br><span class="line">    getOrCompute(split, context)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    computeOrReadCheckpoint(split, context)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>我们只关心这个方法的第一个参数<strong>分区</strong>，以及返回的迭代器。忽略有缓存的情况，我们继续看<code>computeOrReadCheckpoint</code>这个方法:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span>[spark] <span class="function"><span class="keyword">def</span> <span class="title">computeOrReadCheckpoint</span></span>(split: <span class="type">Partition</span>, context: <span class="type">TaskContext</span>): <span class="type">Iterator</span>[<span class="type">T</span>] =</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (isCheckpointedAndMaterialized) &#123;<span class="comment">//如果有checkpoint</span></span><br><span class="line">    firstParent[<span class="type">T</span>].iterator(split, context)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    compute(split, context)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -260,8 +253,7 @@
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">rivate[spark] <span class="class"><span class="keyword">class</span> <span class="title">ParallelCollectionPartition</span>[<span class="type">T</span>: <span class="type">ClassTag</span>](<span class="params"></span></span></span><br><span class="line"><span class="class"><span class="params">    var rddId: <span class="type">Long</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    var slice: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    var values: <span class="type">Seq</span>[<span class="type">T</span>]</span></span></span><br><span class="line"><span class="class"><span class="params">  </span>) <span class="keyword">extends</span> <span class="title">Partition</span> <span class="keyword">with</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">iterator</span></span>: <span class="type">Iterator</span>[<span class="type">T</span>] = values.iterator</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
 <p>iterator 是来自于 values 的一个迭代器，显然，values是内存中的数据。这说明 a 的 compute 方法直接返回了一个与源数据相关的迭代器。而这里 ParallelCollectionPartition 的数据是如何传入的，又是在什么时候被传入的呢?在<strong>分区</strong>小节将会提到。</p>
 <p>到这里，我们已经基本了解了 spark 的迭代计算的原理以及数据来源。但是仍然还有许多不了解的地方，例如 iterotr 会接受一个  Partition 作为参数。那么这个Partition参数到底起到了什么作用。其次，我们知道 rdd 的 iterotr 方法 是从后开始往前调用，那么又是谁调用的最后一个 rdd 的 itertor 方法呢。接下来我们就探索一下与分区相关的内容.</p>
-<h3 id="分区"><a class="markdownIt-Anchor" href="#分区"></a> 分区</h3>
-<p>提到分区，大部分都是类似于“RDD 中最小的数据单元”，“只是数据的抽象分区，而不是真正的持有数据”等等这样的描述。</p>
+<h3 id="分区"><a href="#分区" class="headerlink" title="分区"></a>分区</h3><p>提到分区，大部分都是类似于“RDD 中最小的数据单元”，“只是数据的抽象分区，而不是真正的持有数据”等等这样的描述。</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * An identifier for a partition in an RDD.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">trait</span> <span class="title">Partition</span> <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">index</span></span>: <span class="type">Int</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">hashCode</span></span>(): <span class="type">Int</span> = index</span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">equals</span></span>(other: <span class="type">Any</span>): <span class="type">Boolean</span> = <span class="keyword">super</span>.equals(other)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可以看到分区的类十分的简单，只有一个 index 属性。 当将分区这个参数传入 itertor 时表示我们需要 index 对应的分区的数据经过一系列计算的之后的迭代器。那么显然，在源 RDD 中一定会有更据分区的index获取对应数据的代码部分。而我们又知道，对于<code>ParallelCollectionPartition</code>这个分区类是直接持有数据的迭代器，因此我们只需要知道这个类如何被建立，便知道了是如何根据分区获取数据的。我们在整个工程中搜索 ParallelCollectionPartition，发现:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">getPartitions</span></span>: <span class="type">Array</span>[<span class="type">Partition</span>] = &#123;</span><br><span class="line">   <span class="keyword">val</span> slices = <span class="type">ParallelCollectionRDD</span>.slice(data, numSlices).toArray</span><br><span class="line">   slices.indices.map(i =&gt; <span class="keyword">new</span> <span class="type">ParallelCollectionPartition</span>(id, i, slices(i))).toArray</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
@@ -275,7 +267,7 @@
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">runJob</span></span>[<span class="type">T</span>, <span class="type">U</span>: <span class="type">ClassTag</span>](</span><br><span class="line">    ...</span><br><span class="line">   dagScheduler.runJob(rdd, cleanedFunc, partitions, callSite, resultHandler, localProperties.get)</span><br><span class="line">   ...</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
 <p>而 SparkContext 中的 runJob 又继续调用了 DAGScheduler 中的 runJob 方法， 继而调用了 submitJob 方法。之后由经历了 DAGSchedulerEventProcessLoop.post DAGSchedulerEventProcessLoop.doOnReceive 等方法，最后在 submitMissingTasks 看到建立了 ResultTask 对象。由于一个分区的数据会被一个task 处理，因此我们猜测在 ＲesultTask 中会有关于对应 rdd 调用 iterator 的信息，果然，在ResultTask中找到了 runTask 方法:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">def</span> <span class="title">runTask</span></span>(context: <span class="type">TaskContext</span>): <span class="type">U</span> = &#123;</span><br><span class="line">    <span class="comment">// Deserialize the RDD and the func using the broadcast variables.</span></span><br><span class="line">    <span class="keyword">val</span> threadMXBean = <span class="type">ManagementFactory</span>.getThreadMXBean</span><br><span class="line">    <span class="keyword">val</span> deserializeStartTime = <span class="type">System</span>.currentTimeMillis()</span><br><span class="line">    <span class="keyword">val</span> deserializeStartCpuTime = <span class="keyword">if</span> (threadMXBean.isCurrentThreadCpuTimeSupported) &#123;</span><br><span class="line">      threadMXBean.getCurrentThreadCpuTime</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="number">0</span>L</span><br><span class="line">    <span class="keyword">val</span> ser = <span class="type">SparkEnv</span>.get.closureSerializer.newInstance()</span><br><span class="line">    <span class="keyword">val</span> (rdd, func) = ser.deserialize[(<span class="type">RDD</span>[<span class="type">T</span>], (<span class="type">TaskContext</span>, <span class="type">Iterator</span>[<span class="type">T</span>]) =&gt; <span class="type">U</span>)](</span><br><span class="line">      <span class="type">ByteBuffer</span>.wrap(taskBinary.value), <span class="type">Thread</span>.currentThread.getContextClassLoader)</span><br><span class="line">    _executorDeserializeTime = <span class="type">System</span>.currentTimeMillis() - deserializeStartTime</span><br><span class="line">    _executorDeserializeCpuTime = <span class="keyword">if</span> (threadMXBean.isCurrentThreadCpuTimeSupported) &#123;</span><br><span class="line">      threadMXBean.getCurrentThreadCpuTime - deserializeStartCpuTime</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="number">0</span>L</span><br><span class="line"></span><br><span class="line">    func(context, rdd.iterator(partition, context))<span class="comment">//这里就 b 的iterator被真正调用的地方</span></span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-<p>那么我们可以看到最后一行有一个rdd的调用，而这个rdd 是反徐序列化得的，很明显，这个rdd就是 b。此时，b 调用 iterator 方法的地方找到了，但是分区对象partition依然没有找到从哪里传入。由于 partition 是 ResultTask 构造时传入的，我们回到 submitMissingTasks 中，创建ResultTask时分区参数对应的为变量 part 。</p>
+<p>那么我们可以看到最后一行有一个rdd的调用，而这个rdd 是反徐序列化得的，很明显，这个rdd就是 b。此时，b 调用 iterator 方法的地方找到了，但是分区对象partition依然没有找到从哪里传入。由于 partition 是 ResultTask 构造时传入的，我们回到 submitMissingTasks 中，创建ResultTask时分区参数对应的为变量 part 。 </p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//从需要计算的分区map中获取分区，并生成task</span></span><br><span class="line"> partitionsToCompute.map &#123; id =&gt;</span><br><span class="line">      <span class="keyword">val</span> p: <span class="type">Int</span> = stage.partitions(id)</span><br><span class="line">      <span class="keyword">val</span> part = partitions(p)</span><br><span class="line">      <span class="keyword">val</span> locs = taskIdToLocations(id)</span><br><span class="line">      <span class="keyword">new</span> <span class="type">ResultTask</span>(stage.id, stage.latestInfo.attemptNumber,</span><br><span class="line">        taskBinary, part, locs, id, properties, serializedTaskMetrics,</span><br><span class="line">        <span class="type">Option</span>(jobId), <span class="type">Option</span>(sc.applicationId), sc.applicationAttemptId)</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <p>继续往上看，可以看到 part 是 从 partitions 中获取的。这里我们也可以看出 <strong>一个任务对应一个分区数据</strong>。继续往上看，发现<code>partitions = stage.rdd.partitions</code>。实际上来自于 Stage 中的 rdd 中的 partitions。那么看Stage 对 rdd 这个属性的描述:</p>
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> *</span><br><span class="line"> * <span class="meta">@param</span> rdd <span class="type">RDD</span> that <span class="keyword">this</span> stage runs on: <span class="keyword">for</span> a shuffle map stage, it<span class="symbol">'s</span> the <span class="type">RDD</span> we run map tasks</span><br><span class="line"> *   on, <span class="keyword">while</span> <span class="keyword">for</span> a result stage, it<span class="symbol">'s</span> the target <span class="type">RDD</span> that we ran an action on</span><br><span class="line"> *   这里的意思是 rdd 表示调用 action 算子的 rdd 也就是 b </span><br><span class="line"> */</span><br><span class="line"><span class="keyword">private</span>[scheduler] <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Stage</span>(<span class="params"></span></span></span><br><span class="line"><span class="class"><span class="params">    val id: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    val rdd: <span class="type">RDD</span>[_],</span></span></span><br><span class="line"><span class="class"><span class="params">    val numTasks: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    val parents: <span class="type">List</span>[<span class="type">Stage</span>],</span></span></span><br><span class="line"><span class="class"><span class="params">    val firstJobId: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="class"><span class="params">    val callSite: <span class="type">CallSite</span></span>)</span></span><br><span class="line"><span class="class">  <span class="keyword">extends</span> <span class="title">Logging</span> </span>&#123;</span><br></pre></td></tr></table></figure>
@@ -289,8 +281,7 @@
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">func(context, b.iterator(a.partitions(index), context))<span class="comment">//这里就 b 的iterator被真正调用的地方</span></span><br></pre></td></tr></table></figure>
 <p>这和我们猜测的相同，这个分区确实为 ParallelCollectionPartition 对象，并且也持有了源数据的迭代器。这里其实有一个很巧妙的地方，虽然 RDD  的迭代计算是从后往前调用，但是传入源 RDD 的分区对象依然来自于源 RDD 自身。</p>
 <p>到了这里，我们也就明白分区对象是如何和数据关联起来的。ParallelCollectionPartition 对象中存在分区编号 index 以及 源数据的迭代器，通过分区编号就能获取到源数据的迭代器。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>经过如此大篇幅的讲解，终于对 spark 的迭代计算以及分区做了一个简单的分析。虽然还有很多地方不完善，例如还有其它类型的分区对象没有讲解，但是我相信你能完全看懂这篇文章所讲的内容，其他类型的分区对象对于你来说也很简单了。作者水平有限，并且这也是作者的第一篇关于 spark 源码阅读的博客，难免有遗漏和错误。如果想如给作者提建议和意见的话，请联系作者的微信或直接在 github 上提 issue 。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>经过如此大篇幅的讲解，终于对 spark 的迭代计算以及分区做了一个简单的分析。虽然还有很多地方不完善，例如还有其它类型的分区对象没有讲解，但是我相信你能完全看懂这篇文章所讲的内容，其他类型的分区对象对于你来说也很简单了。作者水平有限，并且这也是作者的第一篇关于 spark 源码阅读的博客，难免有遗漏和错误。如果想如给作者提建议和意见的话，请联系作者的微信或直接在 github 上提 issue 。</p>
 </span>
       
     </div>
@@ -442,7 +433,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#写在最开始"><span class="nav-number">1.</span> <span class="nav-text"> 写在最开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本部分主要内容"><span class="nav-number">2.</span> <span class="nav-text"> 本部分主要内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-number">3.</span> <span class="nav-text"> 准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个简单的例子"><span class="nav-number">4.</span> <span class="nav-text"> 一个简单的例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代计算"><span class="nav-number">5.</span> <span class="nav-text"> 迭代计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#comput-方法与-itertor"><span class="nav-number">5.1.</span> <span class="nav-text"> comput 方法与 itertor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分区"><span class="nav-number">5.2.</span> <span class="nav-text"> 分区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text"> 总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#写在最开始"><span class="nav-number">1.</span> <span class="nav-text">写在最开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本部分主要内容"><span class="nav-number">2.</span> <span class="nav-text">本部分主要内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-number">3.</span> <span class="nav-text">准备工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一个简单的例子"><span class="nav-number">4.</span> <span class="nav-text">一个简单的例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代计算"><span class="nav-number">5.</span> <span class="nav-text">迭代计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#comput-方法与-itertor"><span class="nav-number">5.1.</span> <span class="nav-text">comput 方法与 itertor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分区"><span class="nav-number">5.2.</span> <span class="nav-text">分区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -690,6 +681,27 @@
   </script>
 
   
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
 
   
   

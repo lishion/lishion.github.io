@@ -19,7 +19,7 @@
 
   <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
 
-
+<link href="https://cdn.bootcss.com/KaTeX/0.9.0/katex.min.css" type="text/css"  rel="stylesheet">
 
   <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 
@@ -38,18 +38,18 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。  问题   key 与如何与分区对应的 主要取决于分区器   分区发生在什么时候 建立初始RDD 以及 shu">
+<meta name="description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。 问题 key 与如何与分区对应的 主要取决于分区器  分区发生在什么时候 建立初始RDD 以及 shuffle">
 <meta name="keywords" content="Spark,编程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark 源码阅读计划 - 第三部分 - 图解 shuffle read">
 <meta property="og:url" content="http://yoursite.com/2018/06/11/Spark-源码阅读计划-伪-第三部分-图解-shuffle-write/index.html">
 <meta property="og:site_name" content="Lishion&#39;s Blog">
-<meta property="og:description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。  问题   key 与如何与分区对应的 主要取决于分区器   分区发生在什么时候 建立初始RDD 以及 shu">
+<meta property="og:description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。 问题 key 与如何与分区对应的 主要取决于分区器  分区发生在什么时候 建立初始RDD 以及 shuffle">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-13T14:42:19.376Z">
+<meta property="og:updated_time" content="2018-06-29T09:23:58.678Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark 源码阅读计划 - 第三部分 - 图解 shuffle read">
-<meta name="twitter:description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。  问题   key 与如何与分区对应的 主要取决于分区器   分区发生在什么时候 建立初始RDD 以及 shu">
+<meta name="twitter:description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。 问题 key 与如何与分区对应的 主要取决于分区器  分区发生在什么时候 建立初始RDD 以及 shuffle">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -58,7 +58,6 @@
     sidebar: 'post'
   };
 </script>
-<link href="https://cdn.bootcss.com/KaTeX/0.8.3/katex.min.css" rel="stylesheet">
 
   <title> Spark 源码阅读计划 - 第三部分 - 图解 shuffle read | Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
@@ -217,46 +216,35 @@
       
 
       
-        <span itemprop="articleBody"><p>你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我<s>懒，想玩王者荣耀</s>觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。</p>
-<h2 id="问题"><a class="markdownIt-Anchor" href="#问题"></a> 问题</h2>
-<ol>
-<li>
-<p>key 与如何与分区对应的</p>
+        <span itemprop="articleBody"><p>你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我<del>懒，想玩王者荣耀</del>觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><ol>
+<li><p>key 与如何与分区对应的</p>
 <p>主要取决于分区器</p>
 </li>
-<li>
-<p>分区发生在什么时候</p>
+<li><p>分区发生在什么时候</p>
 <p>建立初始RDD 以及 shuffle的时候</p>
 </li>
-<li>
-<p>key 与分区是一对一映射吗</p>
+<li><p>key 与分区是一对一映射吗</p>
 <p>不是。一个分区可以包含多个key，但同一个 key 只能存在一个分区中(如果使用hash 分区器)</p>
 </li>
-<li>
-<p>如果同一个分区会存在多个key，那么在使用聚合函数的时候会不会把多个key的value聚合到一起?</p>
+<li><p>如果同一个分区会存在多个key，那么在使用聚合函数的时候会不会把多个key的value聚合到一起?</p>
 <p>当然不会，如果这样聚合就出错了。虽然聚合函数的最小处理对象是一个分区，但是实际上还是对 key 进行聚合。</p>
 </li>
-<li>
-<p>combineByKeyWithClassTag 中的 mergeValue 和 mergeCombiners 是否前者作用与分区内，后者作用于分区外(网上大部分都是这么说的，但其实是错误的)</p>
+<li><p>combineByKeyWithClassTag 中的 mergeValue 和 mergeCombiners 是否前者作用与分区内，后者作用于分区外(网上大部分都是这么说的，但其实是错误的)</p>
 <p>不是，具体作用下面会讲解</p>
 </li>
 </ol>
-<h2 id="图解-shuffle-write"><a class="markdownIt-Anchor" href="#图解-shuffle-write"></a> 图解 shuffle write</h2>
-<h3 id="步骤一-分区-聚合"><a class="markdownIt-Anchor" href="#步骤一-分区-聚合"></a> 步骤一、分区 聚合</h3>
-<p>这里是使用了 hash 表存放了聚合后的数据。与普通的 map 不同，数据的存储在一个 data 数组中。规则为索引为偶数的元素存放 KEY ，而对应的 value 存放在 KEY 的下一个元素，注意存放的 KEY 已经不是原始数据的 key，而是 key 以及其对的分区。由于在插入时使用二次探测法，数组中可能存在空值。用k1,v1表示原始数据键值对;<code>key=&gt;p(key)</code>表示分区函数。数据表示流程图如下:</p>
+<h2 id="图解-shuffle-write"><a href="#图解-shuffle-write" class="headerlink" title="图解 shuffle write"></a>图解 shuffle write</h2><h3 id="步骤一、分区-聚合"><a href="#步骤一、分区-聚合" class="headerlink" title="步骤一、分区 聚合"></a>步骤一、分区 聚合</h3><p>这里是使用了 hash 表存放了聚合后的数据。与普通的 map 不同，数据的存储在一个 data 数组中。规则为索引为偶数的元素存放 KEY ，而对应的 value 存放在 KEY 的下一个元素，注意存放的 KEY 已经不是原始数据的 key，而是 key 以及其对的分区。由于在插入时使用二次探测法，数组中可能存在空值。用k1,v1表示原始数据键值对;<code>key=&gt;p(key)</code>表示分区函数。数据表示流程图如下:</p>
 
-<h3 id="步骤二-排序并写入临时文件"><a class="markdownIt-Anchor" href="#步骤二-排序并写入临时文件"></a> 步骤二、排序并写入临时文件</h3>
-<p>如果判断到 data 数组所占用的内存达到一定的阈值，就会对其中的数据进行排序。排序的方式为先对分区进行排序，分区内按照 key 的 hash 值进行排序。然后将排序好的数据写入临时文件，并产生一个空的 data 数组。这里可能发生多次写入临时文件的操作，也有可能最后仍有数据驻留在内存中而没有写入临时文件。例如，本分区一共有 10M 数据，内存阈值为 3M，则一共会发生 3 次写临时文件的操作以及最后会驻留1M的数据在内存中。需要注意的是这里并没有写入分区信息，只是写入原始的 key 以及对应聚合好的数据。</p>
-<h3 id="步骤三-对所有的临时文件以及内存中驻留的文件进行排序"><a class="markdownIt-Anchor" href="#步骤三-对所有的临时文件以及内存中驻留的文件进行排序"></a> 步骤三、对所有的临时文件以及内存中驻留的文件进行排序</h3>
-<p>由于存在多个临时文件并且内存中还有驻留的数据，因此需要对所有的数据进行排序并写入一个大文件中以减少临时文件的个数。这里的排序算法使用的方法大概是这样的:</p>
+<h3 id="步骤二、排序并写入临时文件"><a href="#步骤二、排序并写入临时文件" class="headerlink" title="步骤二、排序并写入临时文件"></a>步骤二、排序并写入临时文件</h3><p>如果判断到 data 数组所占用的内存达到一定的阈值，就会对其中的数据进行排序。排序的方式为先对分区进行排序，分区内按照 key 的 hash 值进行排序。然后将排序好的数据写入临时文件，并产生一个空的 data 数组。这里可能发生多次写入临时文件的操作，也有可能最后仍有数据驻留在内存中而没有写入临时文件。例如，本分区一共有 10M 数据，内存阈值为 3M，则一共会发生 3 次写临时文件的操作以及最后会驻留1M的数据在内存中。需要注意的是这里并没有写入分区信息，只是写入原始的 key 以及对应聚合好的数据。</p>
+<h3 id="步骤三、对所有的临时文件以及内存中驻留的文件进行排序"><a href="#步骤三、对所有的临时文件以及内存中驻留的文件进行排序" class="headerlink" title="步骤三、对所有的临时文件以及内存中驻留的文件进行排序"></a>步骤三、对所有的临时文件以及内存中驻留的文件进行排序</h3><p>由于存在多个临时文件并且内存中还有驻留的数据，因此需要对所有的数据进行排序并写入一个大文件中以减少临时文件的个数。这里的排序算法使用的方法大概是这样的:</p>
 
 <p>每次取出第一行的第一个元素就能得到排序结果，图中每一个竖向的数组就可以看做一个排序完成的临时文件。只不过在 shuffle write 并不是取前一行，而是取前一个分区。虽然文件中只存在 k c。但是在写临时文件时记录了每个分区对应的数据条数，因此仍然可以按分区取数据。</p>
 <p>这里还需要注意的一个地方是对于同一个 key 可能分布在不同的临时文件中，因此在排序的时候仍然需要对相同的 key 进行聚合。聚合方法其实很简单，例如获取到一条数据 (k1,c1)，如果下一条数据 (key,c) key == k1 就将 mergeCombiners 将 c1 与 c聚合，否则 key == k1 的数据已经全部读取完成，也就是剩下的数据中不会存在 key == k1 的数据。</p>
 <p>按照上面的方法不断的读取，聚合数据，写入文件就能将临时文件和内存中的所有数据进行聚合，排序并输出到一个大文件中。随后将每一个分区对应数据条数写入索引文件中，以便于记录大文件中某一条记录属于哪一个分区。完成以上步骤便完成了 shuffle write。</p>
-<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
-<p>读者: 等等，我要先吐个槽。说好的图解呢，怎么就两个图?</p>
-<p>作者: 本来有很多图的，但是我<s>室友找我开黑</s>要去跑步就只画了两个图。</p>
-<p>其实搞清楚 shuffle write 的大致步骤还是很简单的，但是具体到每一个细节就需要仔细的阅读源码了。这里推荐一波作者的<a href="https://lishion.github.io/categories/Spark%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E8%AE%A1%E5%88%92/" target="_blank" rel="noopener">spark源码阅读计划</a>。很<s>混乱</s>详细的解析了关于 shuffle write 每一部分代码，配合今天的<s>图解</s>食用更佳。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>读者: 等等，我要先吐个槽。说好的图解呢，怎么就两个图?</p>
+<p>作者: 本来有很多图的，但是我<del>室友找我开黑</del>要去跑步就只画了两个图。</p>
+<p>其实搞清楚 shuffle write 的大致步骤还是很简单的，但是具体到每一个细节就需要仔细的阅读源码了。这里推荐一波作者的<a href="https://lishion.github.io/categories/Spark%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E8%AE%A1%E5%88%92/" target="_blank" rel="noopener">spark源码阅读计划</a>。很<del>混乱</del>详细的解析了关于 shuffle write 每一部分代码，配合今天的<del>图解</del>食用更佳。</p>
 </span>
       
     </div>
@@ -410,7 +398,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">1.</span> <span class="nav-text"> 问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图解-shuffle-write"><span class="nav-number">2.</span> <span class="nav-text"> 图解 shuffle write</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤一-分区-聚合"><span class="nav-number">2.1.</span> <span class="nav-text"> 步骤一、分区 聚合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤二-排序并写入临时文件"><span class="nav-number">2.2.</span> <span class="nav-text"> 步骤二、排序并写入临时文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤三-对所有的临时文件以及内存中驻留的文件进行排序"><span class="nav-number">2.3.</span> <span class="nav-text"> 步骤三、对所有的临时文件以及内存中驻留的文件进行排序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text"> 总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图解-shuffle-write"><span class="nav-number">2.</span> <span class="nav-text">图解 shuffle write</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤一、分区-聚合"><span class="nav-number">2.1.</span> <span class="nav-text">步骤一、分区 聚合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤二、排序并写入临时文件"><span class="nav-number">2.2.</span> <span class="nav-text">步骤二、排序并写入临时文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#步骤三、对所有的临时文件以及内存中驻留的文件进行排序"><span class="nav-number">2.3.</span> <span class="nav-text">步骤三、对所有的临时文件以及内存中驻留的文件进行排序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -658,6 +646,27 @@
   </script>
 
   
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
 
   
   

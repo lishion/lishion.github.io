@@ -19,7 +19,7 @@
 
   <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
 
-
+<link href="https://cdn.bootcss.com/KaTeX/0.9.0/katex.min.css" type="text/css"  rel="stylesheet">
 
   <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
 
@@ -53,7 +53,6 @@
     sidebar: 'post'
   };
 </script>
-<link href="https://cdn.bootcss.com/KaTeX/0.8.3/katex.min.css" rel="stylesheet">
 
   <title> Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
@@ -219,15 +218,13 @@
         
           <span itemprop="articleBody">
             
-             安装 hexo
-
+            安装 hexo
 安装node
 安装npm
 安装hexo: npm install -g hexo-cli
 
- 建立一个新博客
-
-hexo init blog:使用该命令会在blog目录下建立一个博客并且在source/_posts/hello-world.md生成一篇名为hello world的
+建立一个新博客
+hexo init blog:使用该命令会在blog目录下建立一个博客并且在source/_posts/hello-world.md生成一篇名为hello world的文章，随
             ...
           </span>
           <div class="post-more-link text-center">
@@ -313,8 +310,7 @@ hexo init blog:使用该命令会在blog目录下建立一个博客并且在sour
           <span itemprop="articleBody">
             
             首先立一个flag，这将是一个长期更新的版块。
- 写在最开始
-在我使用spark进行日志分析的时候感受到了spark的便捷与强大。在学习spark初期，我阅读了许多与spark相关的文档，在这个过程中了解了RDD，分区，shuffle等概念，但是我并没有对这些概念有更多具体的认识。由于不了解spar
+写在最开始在我使用spark进行日志分析的时候感受到了spark的便捷与强大。在学习spark初期，我阅读了许多与spark相关的文档，在这个过程中了解了RDD，分区，shuffle等概念，但是我并没有对这些概念有更多具体的认识。由于不了解spark的
             ...
           </span>
           <div class="post-more-link text-center">
@@ -504,6 +500,27 @@ hexo init blog:使用该命令会在blog目录下建立一个博客并且在sour
   </script>
 
   
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
 
   
   

@@ -52,6 +52,7 @@ highlight_theme: night
 
 # MathJax Support
 mathjax:
+  true
 
 
 
