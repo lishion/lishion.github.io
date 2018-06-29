@@ -59,4 +59,4 @@
     sidebar: '{{ theme.sidebar }}'
   };
 </script>
-<link href="https://cdn.bootcss.com/KaTeX/0.7.1/katex.min.css" rel="stylesheet">
+<link href="https://cdn.bootcss.com/KaTeX/0.8.3/katex.min.css" rel="stylesheet">

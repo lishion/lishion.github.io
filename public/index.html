@@ -53,7 +53,7 @@
     sidebar: 'post'
   };
 </script>
-<link href="https://cdn.bootcss.com/KaTeX/0.7.1/katex.min.css" rel="stylesheet">
+<link href="https://cdn.bootcss.com/KaTeX/0.8.3/katex.min.css" rel="stylesheet">
 
   <title> Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
@@ -171,6 +171,93 @@
           
           
             
+              <a class="post-title-link" href="/2018/06/28/数据挖掘基础-最大似然估计与最大后验估计/" itemprop="url">
+                数据挖掘基础-最大似然估计与最大后验估计
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on
+          <time itemprop="dateCreated" datetime="2018-06-28T14:47:50+08:00" content="2018-06-28">
+            2018-06-28
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; In
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/数据挖掘基础/" itemprop="url" rel="index">
+                  <span itemprop="name">数据挖掘基础</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <span itemprop="articleBody">
+            
+            在某些时候，我们知道观测数据是由某个概率模型产生的，但是我们不知道模型的参数。而通过观测数据估计模型参数就称为参数估计。参数估计有很多种方法：最大释然估计、最大后验估计、采样等。这篇文章主要讨论最大释然估计与最大后验证估计。
+ 最大似然估计
+在给定模型参数θ\thetaθ，观测到观测值 XXX 的概
+            ...
+          </span>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2018/06/28/数据挖掘基础-最大似然估计与最大后验估计/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
               <a class="post-title-link" href="/2018/06/28/在hexo中书写latex公式/" itemprop="url">
                 在hexo中书写latex公式
               </a>
@@ -219,7 +306,7 @@
         
           <span itemprop="articleBody">
             
-            昨天在写笔记的时候发现在 typora 中可以正确显示的 latex 公式 hexo 无法正确渲染。hexo 默认渲染器不支持 latex公式。需要安装插件才能使用。这里我采用了hexo-renderer-markdown-it-plus 替换默认的渲染器。其中公式渲染采用 katx 使用步骤如下:
+            昨天在写笔记的时候发现在 typora 中可以正确显示的 latex 公式 hexo 无法正确渲染。hexo 默认渲染器不支持 latex公式。需要安装插件才能使用。这里我采用了hexo-renderer-markdown-it-plus 替换默认的渲染器。其中公式渲染采用 katex 使用步骤如下
             ...
           </span>
           <div class="post-more-link text-center">
@@ -940,99 +1027,6 @@ shuffle 作为 spark 最重要的一部分，也是很多初学者感到头痛�
 
 
     
-      
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      
-      
-        <h1 class="post-title" itemprop="name headline">
-          
-          
-            
-              <a class="post-title-link" href="/2018/06/07/使用git+hexo建立个人博客/" itemprop="url">
-                使用git + hexo 建立个人博客
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          Posted on
-          <time itemprop="dateCreated" datetime="2018-06-07T10:42:45+08:00" content="2018-06-07">
-            2018-06-07
-          </time>
-        </span>
-
-        
-          <span class="post-category" >
-            &nbsp; | &nbsp; In
-            
-              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                <a href="/categories/工具/" itemprop="url" rel="index">
-                  <span itemprop="name">工具</span>
-                </a>
-              </span>
-
-              
-              
-
-            
-          </span>
-        
-
-        
-          
-        
-      </div>
-    </header>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <span itemprop="articleBody">
-            
-             安装 hexo
-
-安装node
-安装npm
-安装hexo: npm install -g hexo-cli
-
- 建立一个新博客
-
-hexo init blog:使用该命令会在blog目录下建立一个博客并且在source/_posts/hello-world.md生成一篇名为hello world的
-            ...
-          </span>
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2018/06/07/使用git+hexo建立个人博客/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1071,7 +1065,7 @@ hexo init blog:使用该命令会在blog目录下建立一个博客并且在sour
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>

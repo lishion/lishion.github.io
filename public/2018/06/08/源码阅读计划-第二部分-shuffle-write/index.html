@@ -46,7 +46,7 @@
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="写在开始的话 shuffle 作为 spark 最重要的一部分，也是很多初学者感到头痛的一部分。简单来说，shuffle 分为两个部分 : shuffle write 和 shuffle read。shuffle write 在 map 端进行，而shuffle read 在 reduce 端进行。本章就准备就 shuffle write 做一个详细的分析。  为什么需要shuffle 在上一章">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-28T05:16:14.194Z">
+<meta property="og:updated_time" content="2018-06-18T12:27:15.863Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="spark源码阅读计划 - 第二部分 - shuffle write">
 <meta name="twitter:description" content="写在开始的话 shuffle 作为 spark 最重要的一部分，也是很多初学者感到头痛的一部分。简单来说，shuffle 分为两个部分 : shuffle write 和 shuffle read。shuffle write 在 map 端进行，而shuffle read 在 reduce 端进行。本章就准备就 shuffle write 做一个详细的分析。  为什么需要shuffle 在上一章">
@@ -58,7 +58,7 @@
     sidebar: 'post'
   };
 </script>
-<link href="https://cdn.bootcss.com/KaTeX/0.7.1/katex.min.css" rel="stylesheet">
+<link href="https://cdn.bootcss.com/KaTeX/0.8.3/katex.min.css" rel="stylesheet">
 
   <title> spark源码阅读计划 - 第二部分 - shuffle write | Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 </head>
@@ -382,7 +382,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
