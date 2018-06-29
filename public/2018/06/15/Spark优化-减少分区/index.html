@@ -4,7 +4,7 @@
 <head>
   
 
-<!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -46,7 +46,7 @@
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。 原">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-29T09:23:58.682Z">
+<meta property="og:updated_time" content="2018-06-29T17:06:08.923Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark调优-选择合适的分区">
 <meta name="twitter:description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。 原">
@@ -59,12 +59,12 @@
   };
 </script>
 
-  <title> Spark调优-选择合适的分区 | Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title> Spark调优-选择合适的分区 | Lishion's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
 
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!--[if lte IE 8]>
+  <!--[if lte IE 8]>
   <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
     <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
       <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
@@ -652,6 +652,6 @@
         effect: "fadeIn"
       });
     });
-  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </script>
 </body>
 </html>

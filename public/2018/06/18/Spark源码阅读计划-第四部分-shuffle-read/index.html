@@ -4,7 +4,7 @@
 <head>
   
 
-<!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -46,7 +46,7 @@
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="拖了这么久终于把 shuffle read 部分的源码看了一遍了。虽然 shuffle read 再数据合并部分的逻辑要比 shuffle 简单，但是由于这个过程中 executor 要到 master 拉取 shuffle write 结果信息，就涉及到 spark 的 block manager 的一些东西，因此完整的 shuffle read 过程依然是很复杂的。但是由于我还是太菜了，对于">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-29T09:23:58.678Z">
+<meta property="og:updated_time" content="2018-06-29T17:06:08.923Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark源码阅读计划-第四部分-shuffle read">
 <meta name="twitter:description" content="拖了这么久终于把 shuffle read 部分的源码看了一遍了。虽然 shuffle read 再数据合并部分的逻辑要比 shuffle 简单，但是由于这个过程中 executor 要到 master 拉取 shuffle write 结果信息，就涉及到 spark 的 block manager 的一些东西，因此完整的 shuffle read 过程依然是很复杂的。但是由于我还是太菜了，对于">
@@ -59,12 +59,12 @@
   };
 </script>
 
-  <title> Spark源码阅读计划-第四部分-shuffle read | Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title> Spark源码阅读计划-第四部分-shuffle read | Lishion's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
 
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!--[if lte IE 8]>
+  <!--[if lte IE 8]>
   <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
     <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
       <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
@@ -691,6 +691,6 @@
         effect: "fadeIn"
       });
     });
-  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </script>
 </body>
 </html>

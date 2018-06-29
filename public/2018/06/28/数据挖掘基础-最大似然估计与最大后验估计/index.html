@@ -4,7 +4,7 @@
 <head>
   
 
-<!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
@@ -47,7 +47,7 @@
 <meta property="og:description" content="在某些时候，我们知道观测数据是由某个概率模型产生的，但是我们不知道模型的参数。而通过观测数据估计模型参数就称为参数估计。参数估计有很多种方法：最大释然估计、最大后验估计、采样等。这篇文章主要讨论最大释然估计与最大后验证估计。 最大似然估计在给定模型参数$ \theta $，观测到观测值 $X1$ 的概率为 $p(\mathbf{X}|\theta)$ ，这称之为似然函数。顾名思义，最大释然估计就是">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2018/06/28/数据挖掘基础-最大似然估计与最大后验估计/func_img.png">
-<meta property="og:updated_time" content="2018-06-29T16:11:41.820Z">
+<meta property="og:updated_time" content="2018-06-29T17:06:08.923Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据挖掘基础-最大似然估计与最大后验估计">
 <meta name="twitter:description" content="在某些时候，我们知道观测数据是由某个概率模型产生的，但是我们不知道模型的参数。而通过观测数据估计模型参数就称为参数估计。参数估计有很多种方法：最大释然估计、最大后验估计、采样等。这篇文章主要讨论最大释然估计与最大后验证估计。 最大似然估计在给定模型参数$ \theta $，观测到观测值 $X1$ 的概率为 $p(\mathbf{X}|\theta)$ ，这称之为似然函数。顾名思义，最大释然估计就是">
@@ -61,12 +61,12 @@
   };
 </script>
 
-  <title> 数据挖掘基础-最大似然估计与最大后验估计 | Lishion's Blog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title> 数据挖掘基础-最大似然估计与最大后验估计 | Lishion's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
 
-  <!-- hexo-inject:begin --><!-- hexo-inject:end --><!--[if lte IE 8]>
+  <!--[if lte IE 8]>
   <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
     <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
       <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
@@ -223,8 +223,9 @@
 <p>举一个例子，抛一枚硬币 6 次，假设这枚硬币正面向上的概率为$\theta$，观测到的结果如下：</p>
 <p><code>正 反 正 正 正 反</code><br>利用这个结果对 $\theta$ 进行一个估计。首先写出似然函数:<br>$$<br>p(\mathbf{X}|\theta)=(1-\theta)\theta^3(1-\theta)<br>$$<br>令导数为 0 ，求得 $\theta = \frac 2 3$。</p>
 <p>有的同学看到这里嘴巴张成了 o 型。抛 6 次 4 次正面向上$\theta=\frac{2}{3}$，那抛 1 次正好有 1 次正面向上岂不是$\theta=1$?其实这里你已经开始使用 $\theta$ 的先验概率了。也就是说，在你以前的观察中，$\theta=0.5$的概率是最高的。而$\theta=1$是几乎不可能的。这也就是我们接下来要讲的<strong>最大后验估计</strong>。</p>
-<h2 id="最大后验估计"><a href="#最大后验估计" class="headerlink" title="最大后验估计"></a>最大后验估计</h2><p>在上面提到，一般来说都会认为 $\theta=0.5$ 概率较大，而 $\theta=1$ 概率较小。这其实相当于我们认为 $\theta$ 也具有一个分布，例如正太分布。也就是将$\theta$看作一个随机变量。这里改变一下符号，令 $\Theta$ 表示需要估计的参数，而 $\theta$ 表示它一个具体的取值 。而最大后验估计的思想就是:</p>
-<p>也就是在观测到$\mathbf{X}$之后，估计$\Theta$并使得 $p(\Theta|\mathbf{X})$ 最大。利用贝叶斯公式：<br>$$<br>p(\Theta=\theta|\mathbf{X}) = \frac{p(\mathbf{X}|\Theta=\theta)P(\Theta=\theta)}{p(\mathbf{X})}<br>$$<br>这里的分母是一个常数，与 $\Theta$ 无关。于是我们只需要最大化分子就可以，于是最后为:<br>$$<br>\mathop{max}_\theta \ p(\mathbf{X}|\Theta=\theta)P(\Theta=\theta)<br>$$<br>可以看出，这里比最大释然估计多出了一个先验概率 $P(\Theta=\theta)$。<br>$$<br>p(\mathbf{X}|\Theta=\theta)<br>$$<br>例如这里我们假设$\Theta \it{N(0.5,0.1)}$。由于计算比较复杂，这里直接画出函数图像为:</p>
+<h2 id="最大后验估计"><a href="#最大后验估计" class="headerlink" title="最大后验估计"></a>最大后验估计</h2><p>在上面提到，一般来说都会认为 $\theta=0.5$ 概率较大，而 $\theta=1$ 概率较小。这其实相当于我们认为 $\theta$ 也具有一个分布，例如正太分布。也就是将$\theta$看作一个随机变量。这里改变一下符号，令 $\Theta$ 表示需要估计的参数，而 $\theta$ 表示它一个具体的取值 。而最大后验估计的思想就是:<br>$$<br>\mathop{max}_\theta \ p(\Theta=\theta|\mathbf{X})<br>$$</p>
+<p>也就是在观测到$\mathbf{X}$之后，估计$\Theta$并使得 $p(\Theta|\mathbf{X})$ 最大。利用贝叶斯公式：<br>$$<br>p(\Theta=\theta|\mathbf{X}) = \frac{p(\mathbf{X}|\Theta=\theta)P(\Theta=\theta)}{p(\mathbf{X})}<br>$$</p>
+<p>这里的分母是一个常数，与 $\Theta$ 无关。于是我们只需要最大化分子就可以，于是最后为:<br>$$<br>\mathop{max}_\theta \ p(\mathbf{X}|\Theta=\theta)P(\Theta=\theta)<br>$$<br>可以看出，这里比最大释然估计多出了一个先验概率 $P(\Theta=\theta)$。<br>$$<br>p(\mathbf{X}|\Theta=\theta)<br>$$<br>例如这里我们假设$\Theta \backsim \it{N(0.5,0.1)}$。由于计算比较复杂，这里直接画出函数图像为:</p>
 <img src="/2018/06/28/数据挖掘基础-最大似然估计与最大后验估计/func_img.png" title="后验函数图像">
 <p>从图像可以估计出$\theta=0.55$，这个结果就比最大似然估计更加贴近实际。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>一般来说，在知道参数正确分布的时候，最大后验估计要优于最大释然估计。而最大似然估计与最大后验估计的差别用一句话概括为:</p>
@@ -664,6 +665,6 @@
         effect: "fadeIn"
       });
     });
-  </script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  </script>
 </body>
 </html>
