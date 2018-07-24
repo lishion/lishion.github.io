@@ -4,7 +4,7 @@ date: 2018-07-23 16:32:56
 tags:
   - python
   - 编程
-categories: scala笔记
+categories: python笔记
 author: lishion
 toc: true
 ---
