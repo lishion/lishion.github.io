@@ -48,7 +48,7 @@ print(getWithIndexes(a,indexes)) #['b', 'd', 'f']
 
 # collections.namedtuple - 给元组命名 
 
-在很多时候，我们会返回一个元祖来表示结构信息，例如我们要描述一个学生:
+在很多时候，我们会返回一个元组来表示结构信息，例如我们要描述一个学生:
 
 ``` python
 student = ("Bob",23,"man")
@@ -67,7 +67,7 @@ print(student.name,student.age,student.gender)
 # Ｂob 23 man
 ```
 
-此时访问元祖中的元素就无须通过下标访问，提高了代码易读性。
+此时访问元组中的元素就无须通过下标访问，提高了代码易读性。
 
 # ljust,rjust,center - 对齐字符串
 
