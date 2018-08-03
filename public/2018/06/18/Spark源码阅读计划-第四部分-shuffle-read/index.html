@@ -29,7 +29,7 @@
 
 
 
-  <meta name="keywords" content="Spark,编程," />
+  <meta name="keywords" content="编程,Spark," />
 
 
 
@@ -39,14 +39,14 @@
 
 
 <meta name="description" content="拖了这么久终于把 shuffle read 部分的源码看了一遍了。虽然 shuffle read 再数据合并部分的逻辑要比 shuffle 简单，但是由于这个过程中 executor 要到 master 拉取 shuffle write 结果信息，就涉及到 spark 的 block manager 的一些东西，因此完整的 shuffle read 过程依然是很复杂的。但是由于我还是太菜了，对于">
-<meta name="keywords" content="Spark,编程">
+<meta name="keywords" content="编程,Spark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark源码阅读计划-第四部分-shuffle read">
 <meta property="og:url" content="http://yoursite.com/2018/06/18/Spark源码阅读计划-第四部分-shuffle-read/index.html">
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="拖了这么久终于把 shuffle read 部分的源码看了一遍了。虽然 shuffle read 再数据合并部分的逻辑要比 shuffle 简单，但是由于这个过程中 executor 要到 master 拉取 shuffle write 结果信息，就涉及到 spark 的 block manager 的一些东西，因此完整的 shuffle read 过程依然是很复杂的。但是由于我还是太菜了，对于">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-29T17:06:08.923Z">
+<meta property="og:updated_time" content="2018-06-20T06:22:05.783Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark源码阅读计划-第四部分-shuffle read">
 <meta name="twitter:description" content="拖了这么久终于把 shuffle read 部分的源码看了一遍了。虽然 shuffle read 再数据合并部分的逻辑要比 shuffle 简单，但是由于这个过程中 executor 要到 master 拉取 shuffle write 结果信息，就涉及到 spark 的 block manager 的一些东西，因此完整的 shuffle read 过程依然是很复杂的。但是由于我还是太菜了，对于">
@@ -264,9 +264,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Spark/" rel="tag">#Spark</a>
-          
             <a href="/tags/编程/" rel="tag">#编程</a>
+          
+            <a href="/tags/Spark/" rel="tag">#Spark</a>
           
         </div>
       
@@ -361,21 +361,21 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-count">24</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">tags</span>
               </a>
           </div>

@@ -46,7 +46,7 @@
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。 原">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-29T17:06:08.923Z">
+<meta property="og:updated_time" content="2018-06-20T06:22:05.783Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark调优-选择合适的分区">
 <meta name="twitter:description" content="昨天在利用 Spark 进行统计分析的时候大佬提醒我可以适当的减少分区数量来加快作业的执行速度。于是今天测试了一下，利用sc.textFile(&amp;quot;xxx&amp;quot;)读取数据，采用默认分区(6657个)时执行时间为 190  秒。当手动使用 coalesce 进行重新分至 120 个分区时执行时间减少到 112 秒。当然这里的 120 并不是随便设置的，而是正好等于作业时候的并行度。 原">
@@ -322,21 +322,21 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-count">24</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">tags</span>
               </a>
           </div>

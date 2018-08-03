@@ -1,0 +1,988 @@
+
+<!doctype html>
+<html class="theme-next use-motion theme-next-mala">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+<link href="https://cdn.bootcss.com/KaTeX/0.9.0/katex.min.css" type="text/css"  rel="stylesheet">
+
+  <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+
+
+  <meta name="keywords" content="机器学习,数据挖掘," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="决策树是一种简单但是应用广泛的分类器。最开始了解到决策树的时候认为它太简单了，就像代码里的 if 语句一样。事实上，决策树虽然简单，但是也是一种非常有效的分类方式。将决策树通过袋装的方式组合为随机深林更是在很多数据环境中拥有比 svm 等经典分类器更优异的性能。周志华老师还提出孤立森利和深度深林等基本单元为决策树等算法。本文主要对决策树的基本概念，决策树的生成剪枝算法进行简述。 决策树的基本概念决">
+<meta name="keywords" content="机器学习,数据挖掘">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据挖掘基础-决策树">
+<meta property="og:url" content="http://yoursite.com/2018/06/30/数据挖掘基础-决策树/index.html">
+<meta property="og:site_name" content="Lishion&#39;s Blog">
+<meta property="og:description" content="决策树是一种简单但是应用广泛的分类器。最开始了解到决策树的时候认为它太简单了，就像代码里的 if 语句一样。事实上，决策树虽然简单，但是也是一种非常有效的分类方式。将决策树通过袋装的方式组合为随机深林更是在很多数据环境中拥有比 svm 等经典分类器更优异的性能。周志华老师还提出孤立森利和深度深林等基本单元为决策树等算法。本文主要对决策树的基本概念，决策树的生成剪枝算法进行简述。 决策树的基本概念决">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2018/06/30/数据挖掘基础-决策树/discrete.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/30/数据挖掘基础-决策树/continue.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/30/数据挖掘基础-决策树/tree.png">
+<meta property="og:image" content="http://yoursite.com/2018/06/30/数据挖掘基础-决策树/cut.png">
+<meta property="og:updated_time" content="2018-07-03T01:53:43.735Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据挖掘基础-决策树">
+<meta name="twitter:description" content="决策树是一种简单但是应用广泛的分类器。最开始了解到决策树的时候认为它太简单了，就像代码里的 if 语句一样。事实上，决策树虽然简单，但是也是一种非常有效的分类方式。将决策树通过袋装的方式组合为随机深林更是在很多数据环境中拥有比 svm 等经典分类器更优异的性能。周志华老师还提出孤立森利和深度深林等基本单元为决策树等算法。本文主要对决策树的基本概念，决策树的生成剪枝算法进行简述。 决策树的基本概念决">
+<meta name="twitter:image" content="http://yoursite.com/2018/06/30/数据挖掘基础-决策树/discrete.png">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mala',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> 数据挖掘基础-决策树 | Lishion's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">LISHION</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            Tags
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    
+      
+
+      
+
+    
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              数据挖掘基础-决策树
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on
+          <time itemprop="dateCreated" datetime="2018-06-30T14:50:49+08:00" content="2018-06-30">
+            2018-06-30
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; In
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/数据挖掘基础/" itemprop="url" rel="index">
+                  <span itemprop="name">数据挖掘基础</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>决策树是一种简单但是应用广泛的分类器。最开始了解到决策树的时候认为它太简单了，就像代码里的 if 语句一样。事实上，决策树虽然简单，但是也是一种非常有效的分类方式。将决策树通过<strong>袋装</strong>的方式组合为随机深林更是在很多数据环境中拥有比 svm 等经典分类器更优异的性能。周志华老师还提出<strong>孤立森利</strong>和<strong>深度深林</strong>等基本单元为决策树等算法。本文主要对决策树的基本概念，决策树的生成剪枝算法进行简述。</p>
+<h2 id="决策树的基本概念"><a href="#决策树的基本概念" class="headerlink" title="决策树的基本概念"></a>决策树的基本概念</h2><p>决策树一种分类算法，也可以用来进行回归。决策树应用树结构对输入结果进行判定，每一个内部节点代表对某一个属性进行测试，而每一条边作为一个测试结果，每一个叶子节点代表一中分类。通过不断的比较将数据分配到某一个叶子节点代表的类中。生成一个决策树有以下步骤:</p>
+<ol>
+<li>特征选择: 选择一个特征作为当前节点的判断标准</li>
+<li>生成子树: 利用选择的特征递归的分裂，直到数据不可分或达到停止条件</li>
+<li>剪枝: 减掉一些子树避免过拟合</li>
+</ol>
+<p>以下将详细的介绍这三个步骤。</p>
+<h2 id="特征选择"><a href="#特征选择" class="headerlink" title="特征选择"></a>特征选择</h2><h3 id="划分方式"><a href="#划分方式" class="headerlink" title="划分方式"></a>划分方式</h3><p>特征选择的具体意义是选择一个特征，利用该特征将数据划分为 N 个子集。划分有<strong>二元划分</strong>和<strong>多路划分两种方式</strong>：</p>
+<p>离散特征的划分:</p>
+<img src="/2018/06/30/数据挖掘基础-决策树/discrete.png" title="离散属性划分">
+<p>注意对于有顺序的离散属性，划分时不能打乱其顺序。例如对于产品质量有:不合格　合格　优良三种类型。作为二元划分可以为: {不合格} $\cup$｛合格、优良｝但是不能为是{合格} $\cup$ {不合格，优良}</p>
+<p>连续特征的换分:</p>
+<img src="/2018/06/30/数据挖掘基础-决策树/continue.png" title="连续属性划分">
+<h3 id="特征选择准则"><a href="#特征选择准则" class="headerlink" title="特征选择准则"></a>特征选择准则</h3><p>选择准则决定了在某个节点选择哪一个特征进行划分。一般有<strong>信息增益</strong>和<strong>信息增益比</strong>两种方式:</p>
+<p><strong>信息增益</strong></p>
+<p>数据的<strong>纯度</strong>可以用来表示数据含有的信息量大小，纯度越高，信息量越大。如果根据某特征划分后，子集的纯度减小，则说明通过该特征获得了未划分之前的信息。如果子集与原始数据的纯度差别越大，则划分的特征就是一个越优的特征。具体请参照<a href="https://lishion.github.io/2018/06/27/%E6%95%B0%E6%8D%AE%E6%8C%96%E6%8E%98%E5%9F%BA%E7%A1%80-%E7%86%B5/" target="_blank" rel="noopener">数据挖掘基础－熵</a>。判断子节点不纯度的度量有<strong>熵</strong>和<strong>基尼系数</strong>。设特征值对样本数据进行了 N 个划分，其中每个划分为$D_1 D_2 … D_N$。对每一个划分$D_m$中<strong>熵</strong>和<strong>基尼系数</strong>定义如下:<br>$$<br>Entropy(D_m) = -\sum_{i=1}^{K}p(C_i)log(p(Ci))<br>$$</p>
+<p>$$<br>Gini(D_m)=\sum_{i=1}^{K}p(C_i)(1-p(C_i))<br>$$</p>
+<p>其中 $p(C_i)$ 表示类 $C_i$ 属于划分 $D_m$ 的概率。即是:<br>$$<br>p(C_i) = \frac{|p(C_i)|}{|D_m|}<br>$$<br>$|.|$表示集合中元素的个数。</p>
+<p>对于下面个人情况和是否同意贷款的数据如下:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">ID</th>
+<th style="text-align:center">年龄</th>
+<th style="text-align:center">有工作</th>
+<th style="text-align:center">有自己的房子</th>
+<th style="text-align:center">信贷情况</th>
+<th style="text-align:center">类别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">青年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">一般</td>
+<td style="text-align:center">N</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">青年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">好</td>
+<td style="text-align:center">N</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">青年</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">好</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">青年</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">一般</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">青年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">一般</td>
+<td style="text-align:center">N</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center">中年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">一般</td>
+<td style="text-align:center">N</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center">中年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">好</td>
+<td style="text-align:center">N</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center">中年</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">好</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center">中年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">非常好</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center">中年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">非常好</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center">老年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">非常好</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">12</td>
+<td style="text-align:center">老年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">好</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">13</td>
+<td style="text-align:center">老年</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">好</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">14</td>
+<td style="text-align:center">老年</td>
+<td style="text-align:center">Y</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">非常好</td>
+<td style="text-align:center">Y</td>
+</tr>
+<tr>
+<td style="text-align:center">15</td>
+<td style="text-align:center">老年</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">N</td>
+<td style="text-align:center">一般</td>
+<td style="text-align:center">N</td>
+</tr>
+</tbody>
+</table>
+<p>利用熵作为不纯度的度量，计算每一个特征划分后子节点的不纯度。特征<strong>年龄</strong>将数据进行三个划分，分别为:</p>
+<p>$D_1={N N Y Y N } ,D2={N N Y Y N },D3={Y Y Y Y N} $</p>
+<p>对于每一个划分的熵为:</p>
+<p>$E(D_1)=-\frac 2 5log_2(\frac 2 5)-\frac 3 5 log_2(\frac 3 5)$</p>
+<p>$E(D_2)=-\frac 2 5log_2(\frac 2 5)-\frac 3 5 log_2(\frac 3 5)$</p>
+<p>$E(D_3)=-\frac 1 5log_2(\frac 1 5)-\frac 4 5 log_2(\frac 4 5)$</p>
+<p>利用每一个划分集合大小占总数据集合大小比例作为权值，最终的熵为:</p>
+<p>$E(D)=\frac 1 3E(D_1)+\frac 1 3 E(D_2)+\frac 1 3 E(D_3)$</p>
+<p> 利用同样的方法，计算<strong>有工作、有自己的房子、信贷情况</strong>等特征的熵为:</p>
+<p>0.674 0.551 0.608</p>
+<p>未划分前数据熵相同，所以在当前节点应该选择特征<strong>有自己的房子</strong>作为划分的特征。</p>
+<p><strong>信息增益比</strong></p>
+<p>信息增益趋向于<strong>选择取值较多的特征</strong>。信息增益比则是使用<strong>信息增益</strong>/<strong>划分后的熵</strong></p>
+<h2 id="生成子树"><a href="#生成子树" class="headerlink" title="生成子树"></a>生成子树</h2><p>在选择了合适的特征进行换分之后，对通过划分得到的每一个集合继续递归的进行寻找特征，进行划分步骤，直到子节点的数据无法划分。</p>
+<p>例如，对于表中的数据，在根节点利用<strong>有自己的房子</strong>作为划分后，得到两个子集合编号为:</p>
+<p>$D_1={4 ,8 ,9, 10, 11, 12} \ D_2={1,2,3,5,6,7,13,14,15}$</p>
+<p>对应的类别为:</p>
+<p>$D_1={Y,Y,Y,Y,Y,Y} \ D_2={N,N,Y,N,N,N,Y,Y,N} $</p>
+<p>可以看出 $D_1$中的数据所有类别相同，无需再划分。对于 $D_2$ 中的数据，剩下<strong>年龄、有工作、信贷情况</strong>这几个特征，计算所有特征对应划分的不纯度，得到不纯度最高的特征为<strong>有工作</strong>。使用<strong>有工作</strong>对 $D_2$ 进行划分，得到:</p>
+<p>$D_3={1,2,5,6,7,15} \ D_4={3,13,14}$</p>
+<p>对应的类别为:</p>
+<p>$D_3={N,N,N,N,N,N} \ D_4={Y,Y,Y}$</p>
+<p>可以看出$D_3$和$D_4$中都有含有一种类别的数据，无需继续划分。因此最终学得的决策树为:</p>
+<img src="/2018/06/30/数据挖掘基础-决策树/tree.png" title="最终学得的决策树">
+<p>一般来说，生成子树的停止条件有很多种。例如:</p>
+<ol>
+<li>叶子节点中的数据都能被分为同一类</li>
+<li>叶子节点中的不纯度小于一定的阈值</li>
+<li>叶子节点包含样本的数据量小于一定的数量</li>
+</ol>
+<h2 id="剪枝"><a href="#剪枝" class="headerlink" title="剪枝"></a>剪枝</h2><p>用上面方法学的决策树可以完全拟合训练数据，容易出现过拟合。将已经学得的决策树进行简化以避免过拟合的过程称之为剪枝。这里介绍一种简单的剪枝算法。</p>
+<p>对于决策树，可以通过极小化决策树整体的损失函数来进行实现。设树$T$的叶节点个数为$|T|$，$N$是其中的一个叶节点。该节点含有的样本数量为$|N|$，其中$k$类的样本数有$|N_k|$个。$E(N)$为节点$N$上的熵，$\alpha \ge 0 $表示模型复杂度对损失函数的影响。决策树模型的最终的损失函数可以表示为:<br>$$<br>C_a(T)=\sum_{i=1}^{|T|}|N|E(N)+\alpha|T|<br>$$<br>即表示为<code>每一个叶节点的熵 x 该节点的个数 + 模型的复杂度</code>。模型的复杂度用叶节点的个数表示。很明显，叶节点的个数越多，模型越复杂。而熵表示叶节点的纯度。熵越小，叶节点越不纯，拟合度就越高。因此损失函数有两部分组成，一部份表示模型对训练数据的拟合程度，一部分表示模型的复杂度。可以写为:<br>$$<br>C_a(T)=C(T)+\alpha|T|<br>$$<br>模型越复杂，对训练数据拟合就越好，$C(T)$ 就越小，同时$\alpha|T|$就越大。反正模型越简单，$\alpha|T|$就越小，但是对模型的拟合度就低，$C(T)$也就越大。因此要想使得$C_a(T)$越小，就要在<strong>模型拟合程度</strong>和<strong>模型复杂度</strong>上取得一个权值。</p>
+<p>剪枝的一个示意图如下:</p>
+<img src="/2018/06/30/数据挖掘基础-决策树/cut.png" title="决策树剪枝">
+<p>对整个决策树进行剪枝的步骤为:</p>
+<ol>
+<li>计算$Ca(T)$</li>
+<li>选择一个叶子节点，设减掉该节点得到的子树为$Ta$。若$Ca(T)&gt;Ca(T_a)$，则需要减掉该叶子节点。</li>
+<li>重复步骤1,2直到无法减掉任何一个叶子节点。</li>
+</ol>
+<h2 id="CART-回归与分类与分类树"><a href="#CART-回归与分类与分类树" class="headerlink" title="CART 回归与分类与分类树"></a>CART 回归与分类与分类树</h2><p>回归与分类树(classification and regression tree,CART)是一种应用广泛的的决策树模型。算法包括了决策树特征的选择，生成，剪枝操作。既可以用于回归，也可以用于分类。CART 决策树模型为<strong>二叉树</strong>，递归的二分每个特征。</p>
+<h3 id="回归树"><a href="#回归树" class="headerlink" title="回归树"></a>回归树</h3><p>回归树通过最小化平方误差来进行特征的选择以及划分点的选择。</p>
+<p>对于训练样本$(X,Y)$。$X=[x_1,x_2,…,x_n]$，其对应的输出$Y=[y_1,y_2,…,y_n]$。划分的原则是找到$x_i$第个j个特征$x^{(j)}$及其取值s。使得数据称为两个划分:<br>$$<br>D_1=x_i|x_i^{(j)}\le s \ \ \ \ \ D_2 =x_i|x_i^{(j)}&gt;s<br>$$<br>划分的准则是使得根据该特征划分后的平方误差最小，即:<br>$$<br>\sum_{i=1}^{N1}(y_{1i}-\hat{y_1})^2 + \sum_{i=1}^{N2} (y_{2i}-\hat{y_2})<br>$$<br>其中 $N_j$表示第 j 个划分样本的个数。$y_{ji}$表示第 j 个划分中的第 i 个样本对应的输出。$\hat{y_j}$表示第 j 个划分的期望输出，$j=1,2$。期望输出定义为:<br>$$<br>\hat{y_j} =\frac 1 N_j \sum_{i=1}^{N_j} y_{ji}<br>$$<br>如我们想用回归树拟合函数$y=3a^2+2b^2$。样本为:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">id</th>
+<th style="text-align:center">a</th>
+<th style="text-align:center">b</th>
+<th style="text-align:center">c</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1.5</td>
+<td style="text-align:center">4.5</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0.1</td>
+<td style="text-align:center">1.4</td>
+<td style="text-align:center">3.94</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">1.3</td>
+<td style="text-align:center">3.5</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:center">0.3</td>
+<td style="text-align:center">1.2</td>
+<td style="text-align:center">3.15</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">0.4</td>
+<td style="text-align:center">1.1</td>
+<td style="text-align:center">2.9</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">2.75</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center">0.6</td>
+<td style="text-align:center">0.9</td>
+<td style="text-align:center">2.7</td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:center">0.7</td>
+<td style="text-align:center">0.8</td>
+<td style="text-align:center">2.75</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center">0.8</td>
+<td style="text-align:center">0.7</td>
+<td style="text-align:center">2.9</td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:center">0.9</td>
+<td style="text-align:center">0.6</td>
+<td style="text-align:center">3.15</td>
+</tr>
+</tbody>
+</table>
+<p>由于这里的变量都是单调递增或者递减的，因此两个变量产生的划分点完全相同。不妨选择变量$a$，不同的划分点对应的平方误差:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">划分点(a)</th>
+<th style="text-align:center">误差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0.15</td>
+</tr>
+<tr>
+<td style="text-align:center">0.1</td>
+<td style="text-align:center">0.14</td>
+</tr>
+<tr>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.19</td>
+</tr>
+<tr>
+<td style="text-align:center">0.3</td>
+<td style="text-align:center">0.27</td>
+</tr>
+<tr>
+<td style="text-align:center">0.4</td>
+<td style="text-align:center">0.35</td>
+</tr>
+<tr>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">0.40</td>
+</tr>
+<tr>
+<td style="text-align:center">0.6</td>
+<td style="text-align:center">0.41</td>
+</tr>
+<tr>
+<td style="text-align:center">0.7</td>
+<td style="text-align:center">0.39</td>
+</tr>
+<tr>
+<td style="text-align:center">0.8</td>
+<td style="text-align:center">0.35</td>
+</tr>
+<tr>
+<td style="text-align:center">0.9</td>
+<td style="text-align:center">0.31</td>
+</tr>
+</tbody>
+</table>
+<p>因此应该选择$a=0.1$作为划分点。划分后两个划分的 id 为:</p>
+<p>$D_1 = 1,2 \ D2 = 3,4,5,6,7,8,9$</p>
+<p>不断的按照此种方法进行划分，直到满足停止条件。最后叶节点的输出就为该节点的期望输出。</p>
+<h3 id="分类树"><a href="#分类树" class="headerlink" title="分类树"></a>分类树</h3><p>分类树采用基尼系数作为特征选择的指标。具体的生成方式与普通的决策树类似。这里不再重复。</p>
+<h3 id="剪枝-1"><a href="#剪枝-1" class="headerlink" title="剪枝"></a>剪枝</h3><p>CART 树的剪枝方式是从生成的完整的树的底端依次的减去一些子树，得到简化后的子树序列 $T_1,T_2,T_3,..,T_N​$。然后用交叉验证的方式检验其中的每一个子树，得到一个子树序列。</p>
+<p>对于某一个节点 $N$ ，进行剪枝后该节点变为变为叶子节点$N_t$。则以节点$Ｎ$为根节点的子树的损失函数:<br>$$<br>C_a(T) = C(T) + \alpha(|T|)<br>$$<br>剪枝之后得到的以$N$为单节点的子树$T_t$的损失函数为:<br>$$<br>C_a(T_t)=C(T_t)+\alpha<br>$$<br>当$\alpha＝０$或足够小时，$C_a(Tt) &gt; C_a(t)$。当$\alpha$慢慢增大到某一个值时，此时有$C_a(Tt) = C_a(t)$。也就是说，只要:<br>$$<br>\alpha = \frac{C_a(T)-C_a(T_t)}{1-|T|}<br>$$<br>$T$ 和 $T_t$ 有相同的损失函数，而此时 $T_t$ 比 $T$ 更小的节点树。因此应该对$T$进行剪枝。</p>
+<p>因此 CART 树的剪枝方式为，对于完整树$T_0$的每一个内部节点，计算:<br>$$<br>\alpha　＝　\frac{C_a(T)-C_a(T_t)}{1-|T|}<br>$$<br>得到其中最小的节点，对该节点进行剪枝操作。对得到的子树重复这种剪枝操作，直到只剩下根节点。随后利用交叉验证的方式对子树序列进行测试，找到误差最小的子树。<strong>这种剪枝方式的优点在于不断的增大</strong>$\alpha$<strong>的值，即不断简化树的结构，得到最优的拟合误差与结构复杂度的均衡</strong>。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag">#机器学习</a>
+          
+            <a href="/tags/数据挖掘/" rel="tag">#数据挖掘</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/03/异常检测-孤立森林/" rel="prev">异常检测-孤立森林</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/28/数据挖掘基础-最大似然估计与最大后验估计/" rel="next">数据挖掘基础-最大似然估计与最大后验估计</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div>
+      
+    </div>
+
+    <div class="post-spread">
+      
+        <div class="bdsharebuttonbox">
+	<a href="#" class="bds_more" data-cmd="more"></a>
+	<a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+	<a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"></a>
+	<a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+</div>
+<script>
+    window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table Of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lishion" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">lishion</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">24</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">categories</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lishion" target="_blank">GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        <div class="links-of-friendly motion-element">
+          
+        </div>
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#决策树的基本概念"><span class="nav-number">1.</span> <span class="nav-text">决策树的基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特征选择"><span class="nav-number">2.</span> <span class="nav-text">特征选择</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#划分方式"><span class="nav-number">2.1.</span> <span class="nav-text">划分方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特征选择准则"><span class="nav-number">2.2.</span> <span class="nav-text">特征选择准则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成子树"><span class="nav-number">3.</span> <span class="nav-text">生成子树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#剪枝"><span class="nav-number">4.</span> <span class="nav-text">剪枝</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CART-回归与分类与分类树"><span class="nav-number">5.</span> <span class="nav-text">CART 回归与分类与分类树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#回归树"><span class="nav-number">5.1.</span> <span class="nav-text">回归树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分类树"><span class="nav-number">5.2.</span> <span class="nav-text">分类树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#剪枝-1"><span class="nav-number">5.3.</span> <span class="nav-text">剪枝</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2018
+  </span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lishion
+  </span>
+</div>
+
+<!-- <div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div> -->
+
+<!-- <div class="theme-info">
+  Theme by <a class="theme-link" href="http://blog.guxiangfly.cn">guxiangfly</a>.<a class="theme-link" href="https://github.com/GuXiangFly/next-guxiangfly">next-guxiangfly</a>
+</div> -->
+
+<!-- busuanzi -->
+
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

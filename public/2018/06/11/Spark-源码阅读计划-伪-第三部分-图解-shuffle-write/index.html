@@ -29,7 +29,7 @@
 
 
 
-  <meta name="keywords" content="Spark,编程," />
+  <meta name="keywords" content="编程,Spark," />
 
 
 
@@ -39,14 +39,14 @@
 
 
 <meta name="description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。 问题 key 与如何与分区对应的 主要取决于分区器  分区发生在什么时候 建立初始RDD 以及 shuffle">
-<meta name="keywords" content="Spark,编程">
+<meta name="keywords" content="编程,Spark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Spark 源码阅读计划 - 第三部分 - 图解 shuffle read">
 <meta property="og:url" content="http://yoursite.com/2018/06/11/Spark-源码阅读计划-伪-第三部分-图解-shuffle-write/index.html">
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。 问题 key 与如何与分区对应的 主要取决于分区器  分区发生在什么时候 建立初始RDD 以及 shuffle">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-29T17:06:08.923Z">
+<meta property="og:updated_time" content="2018-06-20T06:22:05.779Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spark 源码阅读计划 - 第三部分 - 图解 shuffle read">
 <meta name="twitter:description" content="你也许注意到了，今天的源码阅读计划后面有一个伪。没错，我们今天不读源码了，主要是因为我懒，想玩王者荣耀觉得前一章的 shuff write 源码的篇幅太长，害怕大家看完之后摸不着头脑。于是今天制作了 shuffle read 的图解版，顺便解决学习 spark 以来困扰我许久的几个问题。 问题 key 与如何与分区对应的 主要取决于分区器  分区发生在什么时候 建立初始RDD 以及 shuffle">
@@ -253,9 +253,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Spark/" rel="tag">#Spark</a>
-          
             <a href="/tags/编程/" rel="tag">#编程</a>
+          
+            <a href="/tags/Spark/" rel="tag">#Spark</a>
           
         </div>
       
@@ -350,21 +350,21 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-count">24</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">tags</span>
               </a>
           </div>

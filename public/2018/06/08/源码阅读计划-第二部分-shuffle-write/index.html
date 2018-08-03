@@ -29,7 +29,7 @@
 
 
 
-  <meta name="keywords" content="Spark,编程," />
+  <meta name="keywords" content="编程,Spark," />
 
 
 
@@ -39,14 +39,14 @@
 
 
 <meta name="description" content="写在开始的话shuffle 作为 spark 最重要的一部分，也是很多初学者感到头痛的一部分。简单来说，shuffle 分为两个部分 : shuffle write 和 shuffle read。shuffle write 在 map 端进行，而shuffle read 在 reduce 端进行。本章就准备就 shuffle write 做一个详细的分析。 为什么需要shuffle在上一章Spar">
-<meta name="keywords" content="Spark,编程">
+<meta name="keywords" content="编程,Spark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="spark源码阅读计划 - 第二部分 - shuffle write">
 <meta property="og:url" content="http://yoursite.com/2018/06/08/源码阅读计划-第二部分-shuffle-write/index.html">
 <meta property="og:site_name" content="Lishion&#39;s Blog">
 <meta property="og:description" content="写在开始的话shuffle 作为 spark 最重要的一部分，也是很多初学者感到头痛的一部分。简单来说，shuffle 分为两个部分 : shuffle write 和 shuffle read。shuffle write 在 map 端进行，而shuffle read 在 reduce 端进行。本章就准备就 shuffle write 做一个详细的分析。 为什么需要shuffle在上一章Spar">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-06-29T17:06:08.923Z">
+<meta property="og:updated_time" content="2018-06-20T06:22:05.783Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="spark源码阅读计划 - 第二部分 - shuffle write">
 <meta name="twitter:description" content="写在开始的话shuffle 作为 spark 最重要的一部分，也是很多初学者感到头痛的一部分。简单来说，shuffle 分为两个部分 : shuffle write 和 shuffle read。shuffle write 在 map 端进行，而shuffle read 在 reduce 端进行。本章就准备就 shuffle write 做一个详细的分析。 为什么需要shuffle在上一章Spar">
@@ -276,9 +276,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Spark/" rel="tag">#Spark</a>
-          
             <a href="/tags/编程/" rel="tag">#编程</a>
+          
+            <a href="/tags/Spark/" rel="tag">#Spark</a>
           
         </div>
       
@@ -373,21 +373,21 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-count">24</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">12</span>
               <span class="site-state-item-name">tags</span>
               </a>
           </div>
