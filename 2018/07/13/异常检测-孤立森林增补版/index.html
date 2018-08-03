@@ -1,0 +1,679 @@
+
+<!doctype html>
+<html class="theme-next use-motion theme-next-mala">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+<link href="https://cdn.bootcss.com/KaTeX/0.9.0/katex.min.css" type="text/css"  rel="stylesheet">
+
+  <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+
+
+  <meta name="keywords" content="数据挖掘,机器学习,异常检测," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="最近又补了一下孤立森林的增补版，也就是发表在 Isolation-Forest 之后的 Isolation-based Anomaly Detection 。这篇文章主要增加了关于孤立森林为什么比其他检测器表现优秀的原因，另外还增加了一些新的调节检测效果的内容。这篇文章准备对上一篇一些没有讲清楚的概念进行进行一些补充，以及对 Isolation-based Anomaly Detection 中增">
+<meta name="keywords" content="数据挖掘,机器学习,异常检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="异常检测-孤立森林增补版">
+<meta property="og:url" content="http://yoursite.com/2018/07/13/异常检测-孤立森林增补版/index.html">
+<meta property="og:site_name" content="Lishion&#39;s Blog">
+<meta property="og:description" content="最近又补了一下孤立森林的增补版，也就是发表在 Isolation-Forest 之后的 Isolation-based Anomaly Detection 。这篇文章主要增加了关于孤立森林为什么比其他检测器表现优秀的原因，另外还增加了一些新的调节检测效果的内容。这篇文章准备对上一篇一些没有讲清楚的概念进行进行一些补充，以及对 Isolation-based Anomaly Detection 中增">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-08-03T14:41:24.528Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="异常检测-孤立森林增补版">
+<meta name="twitter:description" content="最近又补了一下孤立森林的增补版，也就是发表在 Isolation-Forest 之后的 Isolation-based Anomaly Detection 。这篇文章主要增加了关于孤立森林为什么比其他检测器表现优秀的原因，另外还增加了一些新的调节检测效果的内容。这篇文章准备对上一篇一些没有讲清楚的概念进行进行一些补充，以及对 Isolation-based Anomaly Detection 中增">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mala',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> 异常检测-孤立森林增补版 | Lishion's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">LISHION</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            Tags
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    
+      
+
+      
+
+    
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              异常检测-孤立森林增补版
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on
+          <time itemprop="dateCreated" datetime="2018-07-13T09:56:38+00:00" content="2018-07-13">
+            2018-07-13
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; In
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/异常检测/" itemprop="url" rel="index">
+                  <span itemprop="name">异常检测</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>最近又补了一下孤立森林的增补版，也就是发表在 Isolation-Forest 之后的 Isolation-based Anomaly Detection 。这篇文章主要增加了关于孤立森林为什么比其他检测器表现优秀的原因，另外还增加了一些新的调节检测效果的内容。这篇文章准备对上一篇一些没有讲清楚的概念进行进行一些补充，以及对 Isolation-based Anomaly Detection 中增加的内容也会做一些说明。</p>
+<h2 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h2><h3 id="孤立"><a href="#孤立" class="headerlink" title="孤立"></a>孤立</h3><p>孤立是孤立森林的一大核心思想，孤立森林认为：异常点较正常点更容易被孤立。这里给出孤立的<strong>定义</strong>:</p>
+<p>采用某种划分方式对样本空间进行划分，形成多个子空间。如果某个子空间中只含有一个样本，或一类完全相同的样本，那么这个(些)样本被孤立。</p>
+<p>对应到孤立森林中即是使用<strong>平行与坐标轴的超平面</strong>对样本进行划分。如果某个叶子节点中只含有一个或一类完全样本，那么这个(些)样本被孤立。</p>
+<h3 id="高度与异常值"><a href="#高度与异常值" class="headerlink" title="高度与异常值"></a>高度与异常值</h3><p>从理想情况来看，到最后每一个叶子节点都只含有个样本，也就是说所有的样本都成功被孤立。而此时，孤立样本的异常程度就与样本落在节点的高度成反比。也就是落在越靠近根节点的样本越容易被孤立，异常的程度也就越高。</p>
+<p>但是由于数据不是均匀分布，所以每次进行划分时左右两个子节点获得的数据量不一定均匀的。而由于数的最大高度被设置为$log(x)$，$x$ 为样本的个数，除非每一个节点的样本被均分，否则某几个叶子节点最后的样本数量一定会大于1。而这种情况导致了这些节点上的样本都没有成功被孤立，也就无法单纯通过判断的节点的高度来判断异常程度。因此论文中提出了使用修正值进行修正:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if n &gt; 2:　// n表示形成一颗书的样本个数</span><br><span class="line">	c(n) = 2H(n-1) - 2(n-2)</span><br><span class="line">else if n = 2:</span><br><span class="line">	c(n) = 1</span><br><span class="line">else:</span><br><span class="line">	c(n) = 0</span><br></pre></td></tr></table></figure>
+<p>这里的 c(n) 就是用来进行修正的函数。其中的 $H(x)$ 表示调和级数，可以使用$log(x) + 0.5772156649$ 来近似。c(n) 的含义是一颗二叉树搜索树未成功搜索的平均高度。对应孤立树也就是样本未被孤立的平均高度。而最终的修正结果如下，对与孤立树 $T$，样本$x$落在叶子节点为$N$，修正之后的高度为:<br>$$<br>h(x) = e + c(N.size)<br>$$<br>这是可以理解的，因为x落在的叶子节点如果还含有其他的样本，那么根据这些样本还可以生成新的子树，因此在原本的高度$e$加上这些<strong>样本继续生成子树</strong>的平均高度来进行修正(这里其实应该加上成功搜索的高度，但是估计是为了统一，因此采用未搜索成功的高度)。最终异常得分为:<br>$$<br>s(x,\psi)=2^{-\frac{E(hx)}{c(\psi)}}<br>$$<br>相当于将样本的高度除以了树的平均高度进行了标准化。从这个公式可以看出:</p>
+<ul>
+<li>如果一个样本的平均高度远大于树的未成功搜索高度，那么得分趋近与0。该样本正常。</li>
+<li>如果一个样本的平均高度远小于未成功搜索的树的高度，那么得分趋近于１，该样本异常。</li>
+<li>如果一个样本集合中所有高度约等于未成功搜索的树的高度，那么这些样本得分趋近与0.5。该样本集合无明显异常。</li>
+</ul>
+<h2 id="新增内容"><a href="#新增内容" class="headerlink" title="新增内容"></a>新增内容</h2><h3 id="hlim"><a href="#hlim" class="headerlink" title="hlim"></a>hlim</h3><p>检测时如果大于hlim，则直接返回检测结果。不需要进行到叶子节点才返回。hlim影响了孤立森林的检测行为。比较直观的是，当 hlim=1 时，一些小的团会被全部检测为异常点。当 hlim=6 时，小的团附近的点会被检测未异常点。</p>
+<h3 id="处理高维数据"><a href="#处理高维数据" class="headerlink" title="处理高维数据"></a>处理高维数据</h3><p>当涉及到维度很高的数据时，论文中采用了一种<a href="http://xueshu.baidu.com/s?wd=paperuri%3A%286cfd1026d813182fb51d71e572f42a4b%29&amp;filter=sc_long_sign&amp;tn=SE_xueshusource_2kduw22v&amp;sc_vurl=http%3A%2F%2Fonlinelibrary.wiley.com%2Fdoi%2F10.1111%2F1467-9884.00122%2Fpdf&amp;ie=utf-8&amp;sc_us=5027690243824282375" target="_blank" rel="noopener">kurtosis</a>方式来选取一些子特征来构建孤立树。具体选取方式还没看，如果有时间看了再补上。</p>
+<h3 id="为什么孤立森林更由于基于距离和密度的异常检测"><a href="#为什么孤立森林更由于基于距离和密度的异常检测" class="headerlink" title="为什么孤立森林更由于基于距离和密度的异常检测"></a>为什么孤立森林更由于基于距离和密度的异常检测</h3><ol>
+<li>基于距离的方式无法处理多密度的情况</li>
+<li>有可能局部密度高的地方从全局来看是异常点，也可能局部密度低的地方从全局来看是正常点</li>
+<li>这两种方式对参数选取十分敏感</li>
+<li>这两种参数计算复杂度很高</li>
+</ol>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据挖掘/" rel="tag">#数据挖掘</a>
+          
+            <a href="/tags/机器学习/" rel="tag">#机器学习</a>
+          
+            <a href="/tags/异常检测/" rel="tag">#异常检测</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/20/scala集合类总结/" rel="prev">scala集合类总结</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/12/异常检测-体验孤立森林/" rel="next">异常检测-体验异常森林</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div>
+      
+    </div>
+
+    <div class="post-spread">
+      
+        <div class="bdsharebuttonbox">
+	<a href="#" class="bds_more" data-cmd="more"></a>
+	<a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+	<a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博"></a>
+	<a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+</div>
+<script>
+    window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"1","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table Of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="lishion" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">lishion</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">categories</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/lishion" target="_blank">GitHub</a>
+              </span>
+            
+          
+        </div>
+
+        <div class="links-of-friendly motion-element">
+          
+        </div>
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#相关概念"><span class="nav-number">1.</span> <span class="nav-text">相关概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#孤立"><span class="nav-number">1.1.</span> <span class="nav-text">孤立</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高度与异常值"><span class="nav-number">1.2.</span> <span class="nav-text">高度与异常值</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新增内容"><span class="nav-number">2.</span> <span class="nav-text">新增内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#hlim"><span class="nav-number">2.1.</span> <span class="nav-text">hlim</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理高维数据"><span class="nav-number">2.2.</span> <span class="nav-text">处理高维数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么孤立森林更由于基于距离和密度的异常检测"><span class="nav-number">2.3.</span> <span class="nav-text">为什么孤立森林更由于基于距离和密度的异常检测</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp; 
+  <span itemprop="copyrightYear">2018
+  </span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lishion
+  </span>
+</div>
+
+<!-- <div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div> -->
+
+<!-- <div class="theme-info">
+  Theme by <a class="theme-link" href="http://blog.guxiangfly.cn">guxiangfly</a>.<a class="theme-link" href="https://github.com/GuXiangFly/next-guxiangfly">next-guxiangfly</a>
+</div> -->
+
+<!-- busuanzi -->
+
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.1"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+    });
+  </script>
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
